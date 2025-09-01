@@ -61,10 +61,6 @@ def start_transcription():
         enable_speaker_diarization = data.get('enable_speaker_diarization', True)
         language = data.get('language', 'auto')
         temperature = data.get('temperature', 0.2)
-        beam_size = data.get('beam_size', 5)
-        best_of = data.get('best_of', 1)
-        patience = data.get('patience', 1.0)
-        length_penalty = data.get('length_penalty', 1.0)
         
         if not filename:
             return jsonify({'error': 'No filename provided'}), 400
@@ -98,11 +94,7 @@ def start_transcription():
             model_size=model_size,
             enable_speaker_diarization=enable_speaker_diarization,
             language=language,
-            temperature=temperature,
-            beam_size=beam_size,
-            best_of=best_of,
-            patience=patience,
-            length_penalty=length_penalty
+            temperature=temperature
         )
         
         return jsonify({

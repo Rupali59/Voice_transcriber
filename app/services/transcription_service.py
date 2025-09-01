@@ -44,9 +44,7 @@ class TranscriptionService:
     
     def start_transcription(self, job_id: str, file_upload, model_size: str, 
                           enable_speaker_diarization: bool, language: str,
-                          temperature: float = 0.2, beam_size: int = 5, 
-                          best_of: int = 1, patience: float = 1.0, 
-                          length_penalty: float = 1.0) -> TranscriptionJob:
+                          temperature: float = 0.2) -> TranscriptionJob:
         """Start transcription process"""
         if not self.job_manager or not self.file_service:
             raise RuntimeError("Service not initialized")
@@ -65,8 +63,7 @@ class TranscriptionService:
         # Start background transcription
         thread = threading.Thread(
             target=self._transcribe_background,
-            args=(job_id, file_upload.filepath, model_size, enable_speaker_diarization, language,
-                  temperature, beam_size, best_of, patience, length_penalty)
+            args=(job_id, file_upload.filepath, model_size, enable_speaker_diarization, language, temperature)
         )
         thread.daemon = True
         thread.start()
@@ -74,9 +71,7 @@ class TranscriptionService:
         return job
     
     def _transcribe_background(self, job_id: str, filepath: str, model_size: str, 
-                             enable_speaker_diarization: bool, language: str,
-                             temperature: float, beam_size: int, best_of: int, 
-                             patience: float, length_penalty: float):
+                             enable_speaker_diarization: bool, language: str, temperature: float):
         """Background transcription process"""
         try:
             # Update status
@@ -100,11 +95,7 @@ class TranscriptionService:
             result = transcriber.transcribe_audio(
                 filepath, 
                 language=language,
-                temperature=temperature,
-                beam_size=beam_size,
-                best_of=best_of,
-                patience=patience,
-                length_penalty=length_penalty
+                temperature=temperature
             )
             
             if result:

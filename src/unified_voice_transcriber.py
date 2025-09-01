@@ -234,9 +234,7 @@ class UnifiedVoiceTranscriber:
             # Fallback to single speaker
             return [{'start': 0, 'end': duration, 'speaker': 'Speaker 1'}]
     
-    def transcribe_audio(self, audio_path, output_dir=None, language="auto", 
-                        temperature=0.2, beam_size=5, best_of=1, 
-                        patience=1.0, length_penalty=1.0):
+    def transcribe_audio(self, audio_path, output_dir=None, language="auto", temperature=0.2):
         """
         Transcribe audio file using Whisper with automatic language detection
         
@@ -245,10 +243,6 @@ class UnifiedVoiceTranscriber:
             output_dir (str): Directory to save output files
             language (str): Language code or "auto" for auto-detection
             temperature (float): Sampling temperature (0.0 to 1.0)
-            beam_size (int): Beam size for beam search
-            best_of (int): Number of candidates to consider
-            patience (float): Patience for early stopping
-            length_penalty (float): Length penalty for beam search
             
         Returns:
             dict: Transcription results with speaker information
@@ -275,21 +269,6 @@ class UnifiedVoiceTranscriber:
                 transcribe_kwargs['language'] = language
             else:
                 transcribe_kwargs['language'] = None  # Auto-detect
-            
-            # Log unsupported parameters for user awareness
-            unsupported_params = []
-            if beam_size != 5:
-                unsupported_params.append(f"beam_size={beam_size}")
-            if best_of != 1:
-                unsupported_params.append(f"best_of={best_of}")
-            if patience != 1.0:
-                unsupported_params.append(f"patience={patience}")
-            if length_penalty != 1.0:
-                unsupported_params.append(f"length_penalty={length_penalty}")
-            
-            if unsupported_params:
-                logger.warning(f"Parameters not supported by current Whisper version: {', '.join(unsupported_params)}")
-                logger.info("Using default values for unsupported parameters")
             
             result = self.model.transcribe(audio_path, **transcribe_kwargs)
             

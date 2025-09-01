@@ -155,10 +155,6 @@ class VoiceTranscriberApp {
             const enableSpeakerDiarization = document.getElementById('speakerDiarization').checked;
             const language = document.getElementById('languageSelect').value;
             const temperature = parseFloat(document.getElementById('temperatureSelect').value);
-            const beamSize = parseInt(document.getElementById('beamSizeSelect').value);
-            const bestOf = parseInt(document.getElementById('bestOfSelect').value);
-            const patience = parseFloat(document.getElementById('patienceSelect').value);
-            const lengthPenalty = parseFloat(document.getElementById('lengthPenaltySelect').value);
 
             const response = await fetch('/api/transcribe', {
                 method: 'POST',
@@ -170,11 +166,7 @@ class VoiceTranscriberApp {
                     model_size: modelSize,
                     enable_speaker_diarization: enableSpeakerDiarization,
                     language: language,
-                    temperature: temperature,
-                    beam_size: beamSize,
-                    best_of: bestOf,
-                    patience: patience,
-                    length_penalty: lengthPenalty
+                    temperature: temperature
                 })
             });
 
