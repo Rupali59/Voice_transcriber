@@ -67,19 +67,19 @@
                     <div class="card-body">
                         <!-- Performance Guide -->
                         <div class="performance-guide">
-                            <h3><i class="fas fa-info-circle"></i> Performance Guide</h3>
+                            <h3><i class="fas fa-info-circle"></i> Configuration Guide</h3>
                             <div class="performance-grid">
                                 <div class="performance-item fast">
-                                    <div class="performance-label">Fast Processing</div>
-                                    <div class="performance-desc">Quick results, basic accuracy</div>
+                                    <div class="performance-label">Fast Setup</div>
+                                    <div class="performance-desc">Tiny model + Auto-detect language + No speaker diarization</div>
                                 </div>
                                 <div class="performance-item balanced">
-                                    <div class="performance-label">Balanced</div>
-                                    <div class="performance-desc">Good speed and accuracy</div>
+                                    <div class="performance-label">Recommended</div>
+                                    <div class="performance-desc">Base model + Specific language + Speaker diarization enabled</div>
                                 </div>
                                 <div class="performance-item thorough">
                                     <div class="performance-label">High Quality</div>
-                                    <div class="performance-desc">Best accuracy, slower processing</div>
+                                    <div class="performance-desc">Large model + Specific language + Speaker diarization + Low temperature</div>
                                 </div>
                             </div>
                         </div>
@@ -92,12 +92,13 @@
                                         <i class="fas fa-brain"></i> AI Model
                                     </label>
                                     <select id="modelSelect" class="form-select">
-                                        <option value="tiny">Tiny - Fastest processing, basic accuracy</option>
-                                        <option value="base" selected>Base - Balanced speed and accuracy</option>
-                                        <option value="small">Small - Better accuracy, moderate speed</option>
-                                        <option value="medium">Medium - High accuracy, slower processing</option>
-                                        <option value="large">Large - Best accuracy, slowest processing</option>
+                                        <option value="tiny">Tiny - ~1GB, fastest processing, basic accuracy</option>
+                                        <option value="base" selected>Base - ~1.5GB, balanced speed and accuracy</option>
+                                        <option value="small">Small - ~2GB, better accuracy, moderate speed</option>
+                                        <option value="medium">Medium - ~5GB, high accuracy, slower processing</option>
+                                        <option value="large">Large - ~10GB, best accuracy, slowest processing</option>
                                     </select>
+                                    <p class="option-description">Larger models provide better accuracy but require more memory and processing time</p>
                                 </div>
 
                                 <div class="option-group">
@@ -118,6 +119,7 @@
                                         <option value="ko">Korean</option>
                                         <option value="zh">Chinese</option>
                                     </select>
+                                    <p class="option-description">Specifying language improves accuracy and speed. Auto-detect works for most cases.</p>
                                 </div>
 
                                 <div class="option-group checkbox-group">
@@ -126,6 +128,7 @@
                                         <span class="checkmark"></span>
                                         <i class="fas fa-users"></i> Speaker Diarization
                                     </label>
+                                    <p class="option-description">Identifies different speakers in the audio. Slightly slower but provides speaker labels.</p>
                                 </div>
                             </div>
 
@@ -136,21 +139,21 @@
                                         <i class="fas fa-thermometer-half"></i> Temperature
                                     </label>
                                     <select id="temperatureSelect" class="form-select">
-                                        <option value="0.0">0.0 - Most deterministic</option>
-                                        <option value="0.1">0.1 - Very consistent</option>
-                                        <option value="0.2" selected>0.2 - Balanced</option>
-                                        <option value="0.3">0.3 - More creative</option>
-                                        <option value="0.4">0.4 - Most creative</option>
+                                        <option value="0.0">0.0 - Most deterministic (consistent results)</option>
+                                        <option value="0.1">0.1 - Very consistent (recommended for accuracy)</option>
+                                        <option value="0.2" selected>0.2 - Balanced (good for most cases)</option>
+                                        <option value="0.3">0.3 - More creative (may vary slightly)</option>
+                                        <option value="0.4">0.4 - Most creative (more variation)</option>
                                     </select>
-                                    <p class="option-description">Controls creativity vs consistency in transcription</p>
+                                    <p class="option-description">Lower values = more consistent, higher values = more creative but less predictable</p>
                                 </div>
 
                                 <div class="option-group info-group">
                                     <div class="info-card">
-                                        <i class="fas fa-info-circle"></i>
+                                        <i class="fas fa-lightbulb"></i>
                                         <div class="info-content">
-                                            <strong>Supported Settings</strong>
-                                            <p>All options shown are fully supported by the current Whisper version</p>
+                                            <strong>Quick Tips</strong>
+                                            <p>• Use specific language for better accuracy<br>• Enable speaker diarization for meetings<br>• Lower temperature for consistent results</p>
                                         </div>
                                     </div>
                                 </div>
