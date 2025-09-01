@@ -366,13 +366,18 @@ class VoiceTranscriberApp {
         }
     }
 
-    async viewTranscript() {
-        if (!this.currentResult || !this.currentResult.output_file) {
+    async viewTranscript(filename = null) {
+        // If no filename provided, try to get from current result
+        if (!filename && this.currentResult && this.currentResult.output_file) {
+            filename = this.currentResult.output_file;
+        }
+        
+        // If still no filename, show error
+        if (!filename) {
             this.showError('No transcript available to view');
             return;
         }
 
-        const filename = this.currentResult.output_file;
         document.getElementById('transcriptFilename').textContent = filename;
         document.getElementById('transcriptContent').textContent = 'Loading transcript...';
         
@@ -545,8 +550,8 @@ function cancelTranscription() {
     app.cancelTranscription();
 }
 
-function viewTranscript() {
-    app.viewTranscript();
+function viewTranscript(filename = null) {
+    app.viewTranscript(filename);
 }
 
 function downloadTranscript() {
