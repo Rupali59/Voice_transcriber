@@ -209,12 +209,13 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 24px;
+    padding: 20px;
     background: #ffffff;
     border-radius: 8px;
     border: 1px solid #e1e5e9;
     transition: all 0.2s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    min-width: 0;
 }
 
 .option-group:hover {
@@ -290,11 +291,16 @@ body {
     padding: 14px 16px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     background: white;
     transition: all 0.2s ease;
     color: #374151;
     font-weight: 500;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .form-select:focus {
