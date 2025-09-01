@@ -200,7 +200,7 @@ body {
 
 .options-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     align-items: start;
 }
@@ -253,6 +253,13 @@ body {
 
 
 /* Responsive design */
+@media (max-width: 1200px) {
+    .options-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
 @media (max-width: 768px) {
     .options-row {
         grid-template-columns: 1fr;
@@ -262,8 +269,6 @@ body {
     .option-group {
         padding: 20px;
     }
-    
-
 }
 
 .option-description {
