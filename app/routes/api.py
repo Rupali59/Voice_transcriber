@@ -7,7 +7,6 @@ import uuid
 from flask import Blueprint, request, jsonify, send_file, current_app
 from werkzeug.exceptions import RequestEntityTooLarge
 
-from app import transcription_service, file_service
 from app.models.file_upload import FileUpload
 
 api_bp = Blueprint('api', __name__)
@@ -22,6 +21,13 @@ def upload_file():
         file = request.files['file']
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
+        
+        # Get file service from app context
+        from app.services.file_service import FileService
+        file_service = FileService(
+            current_app.config['UPLOAD_FOLDER'],
+            current_app.config['ALLOWED_EXTENSIONS']
+        )
         
         # Save uploaded file
         file_upload = file_service.save_uploaded_file(
@@ -75,6 +81,11 @@ def start_transcription():
         # Generate job ID
         job_id = str(uuid.uuid4())
         
+        # Get transcription service from app context
+        from app.services.transcription_service import TranscriptionService
+        transcription_service = TranscriptionService()
+        transcription_service.init_app(current_app)
+        
         # Start transcription
         job = transcription_service.start_transcription(
             job_id=job_id,
@@ -97,6 +108,10 @@ def start_transcription():
 @api_bp.route('/job/<job_id>')
 def get_job_status(job_id):
     """Get job status"""
+    from app.services.transcription_service import TranscriptionService
+    transcription_service = TranscriptionService()
+    transcription_service.init_app(current_app)
+    
     job = transcription_service.get_job(job_id)
     if not job:
         return jsonify({'error': 'Job not found'}), 404

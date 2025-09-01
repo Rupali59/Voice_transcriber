@@ -11,12 +11,10 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.config import Config
 from app.routes import main_bp, api_bp
-from app.services.transcription_service import TranscriptionService
 from app.utils.logger import setup_logging
 
 # Global instances
 socketio = SocketIO()
-transcription_service = TranscriptionService()
 
 def create_app(config_class=Config):
     """Application factory pattern"""
@@ -40,9 +38,6 @@ def create_app(config_class=Config):
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs('transcriptions', exist_ok=True)
     os.makedirs('logs', exist_ok=True)
-    
-    # Initialize services
-    transcription_service.init_app(app)
     
     # Register socketio events
     from app.routes.socketio_events import register_socketio_events

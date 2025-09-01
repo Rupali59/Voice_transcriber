@@ -14,9 +14,12 @@ def index():
 @main_bp.route('/health')
 def health_check():
     """Health check endpoint"""
-    from flask import jsonify
+    from flask import jsonify, current_app
     from datetime import datetime
-    from app import transcription_service
+    
+    from app.services.transcription_service import TranscriptionService
+    transcription_service = TranscriptionService()
+    transcription_service.init_app(current_app)
     
     return jsonify({
         'status': 'healthy',
