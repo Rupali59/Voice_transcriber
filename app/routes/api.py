@@ -120,6 +120,57 @@ def get_job_status(job_id):
     
     return jsonify(job.to_dict())
 
+@api_bp.route('/job-status/<job_id>')
+def get_job_status_api(job_id):
+    """Get job status for API calls"""
+    try:
+        from app.services.transcription_service import TranscriptionService
+        transcription_service = TranscriptionService()
+        transcription_service.init_app(current_app)
+        
+        job = transcription_service.get_job(job_id)
+        if not job:
+            return jsonify({'success': False, 'error': 'Job not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'job_id': job_id,
+            'status': job.status,
+            'progress': job.progress,
+            'message': job.message,
+            'result': job.result,
+            'created_at': job.created_at.isoformat() if job.created_at else None,
+            'updated_at': job.updated_at.isoformat() if job.updated_at else None
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Job status error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get job status'}), 500
+
+@api_bp.route('/cancel-job/<job_id>', methods=['POST'])
+def cancel_job(job_id):
+    """Cancel a transcription job"""
+    try:
+        from app.services.transcription_service import TranscriptionService
+        transcription_service = TranscriptionService()
+        transcription_service.init_app(current_app)
+        
+        success = transcription_service.cancel_job(job_id)
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Job cancelled successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Job not found or already completed'
+            }), 404
+            
+    except Exception as e:
+        current_app.logger.error(f"Cancel job error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to cancel job'}), 500
+
 @api_bp.route('/download/<filename>')
 def download_file(filename):
     """Download transcription file"""

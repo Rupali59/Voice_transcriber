@@ -205,3 +205,20 @@ class TranscriptionService:
         if self.job_manager:
             return self.job_manager.get_all_jobs()
         return {}
+    
+    def cancel_job(self, job_id: str) -> bool:
+        """Cancel a transcription job"""
+        if not self.job_manager:
+            return False
+        
+        job = self.job_manager.get_job(job_id)
+        if not job:
+            return False
+        
+        # Only cancel if job is still running
+        if job.status in ['starting', 'loading_model', 'transcribing', 'processing']:
+            self.job_manager.update_job_status(job_id, 'cancelled', job.progress)
+            self._emit_progress_update(job_id, 'cancelled', job.progress, 'Transcription cancelled')
+            return True
+        
+        return False

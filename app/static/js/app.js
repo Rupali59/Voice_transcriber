@@ -4,6 +4,8 @@ class VoiceTranscriberApp {
         this.socket = null;
         this.currentJobId = null;
         this.uploadedFile = null;
+        this.startTime = null;
+        this.refreshInterval = null;
         this.initializeApp();
     }
 
@@ -18,6 +20,7 @@ class VoiceTranscriberApp {
         
         this.socket.on('connect', () => {
             console.log('Connected to server');
+            this.updateConnectionStatus('connected');
         });
 
         this.socket.on('progress_update', (data) => {
@@ -26,6 +29,12 @@ class VoiceTranscriberApp {
 
         this.socket.on('disconnect', () => {
             console.log('Disconnected from server');
+            this.updateConnectionStatus('disconnected');
+        });
+
+        this.socket.on('connect_error', () => {
+            console.log('Connection error');
+            this.updateConnectionStatus('disconnected');
         });
     }
 
@@ -174,8 +183,10 @@ class VoiceTranscriberApp {
 
             if (result.success) {
                 this.currentJobId = result.job_id;
+                this.startTime = new Date();
                 this.showProgress();
                 this.hideResults();
+                this.startStatusRefresh();
             } else {
                 this.showError(result.error || 'Failed to start transcription');
             }
@@ -246,11 +257,112 @@ class VoiceTranscriberApp {
     showProgress() {
         document.getElementById('progressSection').style.display = 'block';
         document.getElementById('transcribeBtn').disabled = true;
+        this.updateStatusInfo();
     }
 
     hideProgress() {
         document.getElementById('progressSection').style.display = 'none';
         document.getElementById('transcribeBtn').disabled = false;
+        this.stopStatusRefresh();
+    }
+
+    updateStatusInfo() {
+        if (this.currentJobId) {
+            document.getElementById('jobId').textContent = this.currentJobId;
+        }
+        
+        if (this.startTime) {
+            const timeString = this.startTime.toLocaleTimeString();
+            document.getElementById('startTime').textContent = timeString;
+        }
+    }
+
+    updateConnectionStatus(status) {
+        const statusElement = document.getElementById('connectionStatus');
+        if (statusElement) {
+            statusElement.className = `status-${status}`;
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+    }
+
+    startStatusRefresh() {
+        // Refresh status every 5 seconds as a fallback
+        this.refreshInterval = setInterval(() => {
+            if (this.currentJobId) {
+                this.refreshStatus();
+            }
+        }, 5000);
+    }
+
+    stopStatusRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
+    }
+
+    async refreshStatus() {
+        if (!this.currentJobId) return;
+
+        const refreshBtn = document.getElementById('refreshStatusBtn');
+        const originalContent = refreshBtn.innerHTML;
+        
+        try {
+            // Show loading state
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt btn-refreshing"></i> Refreshing...';
+            refreshBtn.disabled = true;
+
+            const response = await fetch(`/api/job-status/${this.currentJobId}`);
+            const result = await response.json();
+
+            if (result.success) {
+                // Update progress with the latest status
+                this.updateProgress({
+                    job_id: this.currentJobId,
+                    status: result.status,
+                    progress: result.progress || 0,
+                    message: result.message || 'Processing...',
+                    result: result.result
+                });
+            } else {
+                console.error('Failed to refresh status:', result.error);
+            }
+        } catch (error) {
+            console.error('Error refreshing status:', error);
+        } finally {
+            // Restore button state
+            refreshBtn.innerHTML = originalContent;
+            refreshBtn.disabled = false;
+        }
+    }
+
+    async cancelTranscription() {
+        if (!this.currentJobId) return;
+
+        if (!confirm('Are you sure you want to cancel this transcription?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/cancel-job/${this.currentJobId}`, {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                this.showError('Transcription cancelled');
+                this.hideProgress();
+                this.hideResults();
+                this.currentJobId = null;
+                this.startTime = null;
+            } else {
+                this.showError(result.error || 'Failed to cancel transcription');
+            }
+        } catch (error) {
+            console.error('Error cancelling transcription:', error);
+            this.showError('Failed to cancel transcription');
+        }
     }
 
     showResults(result) {
@@ -368,6 +480,14 @@ function downloadResult() {
 
 function startNewTranscription() {
     app.startNewTranscription();
+}
+
+function refreshStatus() {
+    app.refreshStatus();
+}
+
+function cancelTranscription() {
+    app.cancelTranscription();
 }
 
 // Initialize app when DOM is loaded
