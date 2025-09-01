@@ -17,9 +17,8 @@ def health_check():
     from flask import jsonify, current_app
     from datetime import datetime
     
-    from app.services.transcription_service import TranscriptionService
-    transcription_service = TranscriptionService()
-    transcription_service.init_app(current_app)
+    from app import get_transcription_service
+    transcription_service = get_transcription_service()
     
     return jsonify({
         'status': 'healthy',

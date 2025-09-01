@@ -44,7 +44,7 @@ class TranscriptionService:
     
     def start_transcription(self, job_id: str, file_upload, model_size: str, 
                           enable_speaker_diarization: bool, language: str,
-                          temperature: float = 0.2) -> TranscriptionJob:
+                          temperature: float = 0.2, request_id: str = None) -> TranscriptionJob:
         """Start transcription process"""
         if not self.job_manager or not self.file_service:
             raise RuntimeError("Service not initialized")
@@ -63,7 +63,7 @@ class TranscriptionService:
         # Start background transcription
         thread = threading.Thread(
             target=self._transcribe_background,
-            args=(job_id, file_upload.filepath, model_size, enable_speaker_diarization, language, temperature)
+            args=(job_id, file_upload.filepath, model_size, enable_speaker_diarization, language, temperature, request_id)
         )
         thread.daemon = True
         thread.start()
@@ -71,12 +71,13 @@ class TranscriptionService:
         return job
     
     def _transcribe_background(self, job_id: str, filepath: str, model_size: str, 
-                             enable_speaker_diarization: bool, language: str, temperature: float):
+                             enable_speaker_diarization: bool, language: str, temperature: float, request_id: str = None):
         """Background transcription process"""
         try:
             # Update status
             self.job_manager.update_job_status(job_id, 'loading_model', 10)
             self._emit_progress_update(job_id, 'loading_model', 10, 'Loading Whisper model...')
+            self._update_request_tracking(request_id, 'loading_model', 10)
             
             # Create transcriber
             if not UnifiedVoiceTranscriber:
@@ -90,6 +91,7 @@ class TranscriptionService:
             # Update status
             self.job_manager.update_job_status(job_id, 'transcribing', 30)
             self._emit_progress_update(job_id, 'transcribing', 30, 'Transcribing audio...')
+            self._update_request_tracking(request_id, 'transcribing', 30)
             
             # Transcribe audio
             result = transcriber.transcribe_audio(
@@ -102,6 +104,7 @@ class TranscriptionService:
                 # Update status
                 self.job_manager.update_job_status(job_id, 'processing', 80)
                 self._emit_progress_update(job_id, 'processing', 80, 'Processing results...')
+                self._update_request_tracking(request_id, 'processing', 80)
                 
                 # Save transcription
                 output_filename = f"transcription_{job_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
@@ -131,6 +134,7 @@ class TranscriptionService:
                     'duration': result.get('duration', 'Unknown'),
                     'speakers': len(set([seg.get('speaker', 'Unknown') for seg in result.get('segments', [])]))
                 })
+                self._update_request_tracking(request_id, 'completed', 100, result_file=output_filename)
                 
             else:
                 raise Exception("Transcription failed")
@@ -138,21 +142,42 @@ class TranscriptionService:
         except Exception as e:
             self.job_manager.set_job_error(job_id, str(e))
             self._emit_progress_update(job_id, 'error', 0, f'Error: {str(e)}')
+            self._update_request_tracking(request_id, 'error', 0, error=str(e))
     
     def _emit_progress_update(self, job_id: str, status: str, progress: int, message: str, result: dict = None):
         """Emit progress update via SocketIO"""
         if self.app:
-            from flask_socketio import emit
-            data = {
-                'job_id': job_id,
-                'status': status,
-                'progress': progress,
-                'message': message
-            }
-            if result:
-                data['result'] = result
-            
-            emit('progress_update', data, namespace='/')
+            try:
+                from flask_socketio import emit
+                data = {
+                    'job_id': job_id,
+                    'status': status,
+                    'progress': progress,
+                    'message': message
+                }
+                if result:
+                    data['result'] = result
+                
+                # Use app context for SocketIO emit
+                with self.app.app_context():
+                    emit('progress_update', data, namespace='/')
+            except Exception as e:
+                # If SocketIO fails, just log the error and continue
+                print(f"SocketIO emit error: {e}")
+    
+    def _update_request_tracking(self, request_id: str, status: str, progress: int = None, error: str = None, result_file: str = None):
+        """Update request tracking"""
+        if request_id and self.app:
+            try:
+                from app import get_request_tracker
+                request_tracker = get_request_tracker()
+                
+                if status == 'completed' and result_file:
+                    request_tracker.complete_request(request_id, result_file)
+                else:
+                    request_tracker.update_request_status(request_id, status, progress, error)
+            except Exception as e:
+                print(f"Request tracking update error: {e}")
     
     def _generate_transcription_markdown(self, filepath: str, result: dict, model_size: str, start_time: str) -> str:
         """Generate markdown content for transcription"""

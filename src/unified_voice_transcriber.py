@@ -222,7 +222,7 @@ class UnifiedVoiceTranscriber:
             if current_speaker is not None:
                 merged_segments.append({
                     'start': current_start,
-                    'end': duration,
+                    'end': duration,  # duration is available from extract_audio_features
                     'speaker': current_speaker
                 })
             
@@ -231,7 +231,13 @@ class UnifiedVoiceTranscriber:
             
         except Exception as e:
             logger.error(f"Error in speaker diarization: {e}")
-            # Fallback to single speaker
+            # Fallback to single speaker - get duration from audio file
+            try:
+                import librosa
+                y, sr = librosa.load(audio_path, sr=None)
+                duration = len(y) / sr
+            except:
+                duration = 0  # fallback duration
             return [{'start': 0, 'end': duration, 'speaker': 'Speaker 1'}]
     
     def transcribe_audio(self, audio_path, output_dir=None, language="auto", temperature=0.2):
