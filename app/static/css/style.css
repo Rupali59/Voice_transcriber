@@ -189,10 +189,10 @@ body {
     font-size: 0.9rem;
 }
 
-/* Options Grid */
-.options-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+/* Options Container */
+.options-container {
+    display: flex;
+    flex-direction: column;
     gap: 25px;
 }
 
@@ -200,6 +200,18 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.option-group:hover {
+    background: #f0f4ff;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
 .option-group label {
@@ -214,6 +226,34 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin: 0;
+    line-height: 1.4;
+}
+
+/* Performance indicators */
+.option-group option {
+    font-size: 0.95rem;
+    padding: 8px 12px;
+}
+
+.option-group select option[value="tiny"],
+.option-group select option[value="1"],
+.option-group select option[value="0.0"],
+.option-group select option[value="0.5"] {
+    background: #e8f5e8;
+}
+
+.option-group select option[value="base"],
+.option-group select option[value="5"],
+.option-group select option[value="0.2"],
+.option-group select option[value="1.0"] {
+    background: #fff3cd;
+}
+
+.option-group select option[value="large"],
+.option-group select option[value="10"],
+.option-group select option[value="0.4"],
+.option-group select option[value="2.0"] {
+    background: #f8d7da;
 }
 
 /* Form Elements */

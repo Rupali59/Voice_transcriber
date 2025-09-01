@@ -234,13 +234,21 @@ class UnifiedVoiceTranscriber:
             # Fallback to single speaker
             return [{'start': 0, 'end': duration, 'speaker': 'Speaker 1'}]
     
-    def transcribe_audio(self, audio_path, output_dir=None):
+    def transcribe_audio(self, audio_path, output_dir=None, language="auto", 
+                        temperature=0.2, beam_size=5, best_of=1, 
+                        patience=1.0, length_penalty=1.0):
         """
         Transcribe audio file using Whisper with automatic language detection
         
         Args:
             audio_path (str): Path to audio file
             output_dir (str): Directory to save output files
+            language (str): Language code or "auto" for auto-detection
+            temperature (float): Sampling temperature (0.0 to 1.0)
+            beam_size (int): Beam size for beam search
+            best_of (int): Number of candidates to consider
+            patience (float): Patience for early stopping
+            length_penalty (float): Length penalty for beam search
             
         Returns:
             dict: Transcription results with speaker information
@@ -256,13 +264,24 @@ class UnifiedVoiceTranscriber:
             if self.enable_speaker_diarization:
                 speaker_segments = self.perform_speaker_diarization(audio_path)
             
-            # Transcribe the audio with automatic language detection
-            result = self.model.transcribe(
-                audio_path,
-                language=None,  # Auto-detect language
-                task=self.task,
-                word_timestamps=True
-            )
+            # Transcribe the audio with specified parameters
+            transcribe_kwargs = {
+                'task': self.task,
+                'word_timestamps': True,
+                'temperature': temperature,
+                'beam_size': beam_size,
+                'best_of': best_of,
+                'patience': patience,
+                'length_penalty': length_penalty
+            }
+            
+            # Set language if specified
+            if language != "auto":
+                transcribe_kwargs['language'] = language
+            else:
+                transcribe_kwargs['language'] = None  # Auto-detect
+            
+            result = self.model.transcribe(audio_path, **transcribe_kwargs)
             
             # Store detected language
             self.language = result.get("language", "unknown")
