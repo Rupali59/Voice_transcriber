@@ -210,6 +210,28 @@ def download_file(filename):
         current_app.logger.error(f"Download error: {e}")
         return jsonify({'error': 'Download failed'}), 500
 
+@api_bp.route('/transcript/<filename>')
+def get_transcript(filename):
+    """Get transcription content for viewing"""
+    try:
+        filepath = os.path.join('transcriptions', filename)
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'File not found'}), 404
+        
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'content': content,
+            'size': os.path.getsize(filepath)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get transcript error: {e}")
+        return jsonify({'error': 'Failed to read transcript'}), 500
+
 @api_bp.route('/models')
 def get_available_models():
     """Get available Whisper models"""

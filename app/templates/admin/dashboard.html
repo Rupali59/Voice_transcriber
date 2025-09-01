@@ -150,6 +150,34 @@
         </div>
     </div>
 
+    <!-- Transcript Viewer Modal -->
+    <div class="modal fade" id="transcriptModal" tabindex="-1" aria-labelledby="transcriptModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transcriptModalLabel">
+                        <i class="fas fa-file-alt"></i> Transcript Viewer
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>File:</strong> <span id="transcriptFilename">-</span>
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="downloadTranscript()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                    <div class="transcript-content" style="max-height: 500px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap;" id="transcriptContent">
+                        Loading transcript...
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         async function loadStatistics() {
@@ -204,6 +232,9 @@
                                 <div class="col-md-3">
                                     <small>Started: ${new Date(req.start_time).toLocaleString()}</small><br>
                                     ${req.processing_time_seconds ? `<small>Time: ${req.processing_time_seconds.toFixed(1)}s</small>` : ''}
+                                    ${req.result_file ? `<br><button class="btn btn-sm btn-outline-primary mt-1" onclick="viewTranscript('${req.result_file}')">
+                                        <i class="fas fa-eye"></i> View Transcript
+                                    </button>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -269,6 +300,43 @@
         
         // Auto-refresh every 30 seconds
         setInterval(refreshData, 30000);
+
+        // Transcript viewer functions
+        let currentTranscriptFile = null;
+
+        async function viewTranscript(filename) {
+            currentTranscriptFile = filename;
+            document.getElementById('transcriptFilename').textContent = filename;
+            document.getElementById('transcriptContent').textContent = 'Loading transcript...';
+            
+            const modal = new bootstrap.Modal(document.getElementById('transcriptModal'));
+            modal.show();
+            
+            try {
+                const response = await fetch(`/api/transcript/${filename}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('transcriptContent').textContent = data.content;
+                } else {
+                    document.getElementById('transcriptContent').textContent = 'Error loading transcript: ' + data.error;
+                }
+            } catch (error) {
+                console.error('Error loading transcript:', error);
+                document.getElementById('transcriptContent').textContent = 'Error loading transcript: ' + error.message;
+            }
+        }
+
+        function downloadTranscript() {
+            if (currentTranscriptFile) {
+                const link = document.createElement('a');
+                link.href = `/api/download/${currentTranscriptFile}`;
+                link.download = currentTranscriptFile;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
     </script>
 </body>
 </html>

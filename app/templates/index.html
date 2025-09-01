@@ -201,6 +201,9 @@
                         </div>
                         
                         <div class="result-actions">
+                            <button class="btn btn-info" id="viewTranscriptBtn" onclick="viewTranscript()">
+                                <i class="fas fa-eye"></i> View Transcript
+                            </button>
                             <button class="btn btn-success" id="downloadBtn" onclick="downloadResult()">
                                 <i class="fas fa-download"></i> Download Transcription
                             </button>
@@ -212,6 +215,34 @@
                 </div>
             </section>
         </main>
+
+        <!-- Transcript Viewer Modal -->
+        <div class="modal fade" id="transcriptModal" tabindex="-1" aria-labelledby="transcriptModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="transcriptModalLabel">
+                            <i class="fas fa-file-alt"></i> Transcript Viewer
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <strong>File:</strong> <span id="transcriptFilename">-</span>
+                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="downloadTranscript()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                        <div class="transcript-content" style="max-height: 500px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap;" id="transcriptContent">
+                            Loading transcript...
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer class="footer">

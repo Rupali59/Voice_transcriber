@@ -6,6 +6,7 @@ class VoiceTranscriberApp {
         this.uploadedFile = null;
         this.startTime = null;
         this.refreshInterval = null;
+        this.currentResult = null;
         this.initializeApp();
     }
 
@@ -365,6 +366,49 @@ class VoiceTranscriberApp {
         }
     }
 
+    async viewTranscript() {
+        if (!this.currentResult || !this.currentResult.output_file) {
+            this.showError('No transcript available to view');
+            return;
+        }
+
+        const filename = this.currentResult.output_file;
+        document.getElementById('transcriptFilename').textContent = filename;
+        document.getElementById('transcriptContent').textContent = 'Loading transcript...';
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('transcriptModal'));
+        modal.show();
+        
+        try {
+            const response = await fetch(`/api/transcript/${filename}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('transcriptContent').textContent = data.content;
+            } else {
+                document.getElementById('transcriptContent').textContent = 'Error loading transcript: ' + data.error;
+            }
+        } catch (error) {
+            console.error('Error loading transcript:', error);
+            document.getElementById('transcriptContent').textContent = 'Error loading transcript: ' + error.message;
+        }
+    }
+
+    downloadTranscript() {
+        if (this.currentResult && this.currentResult.output_file) {
+            const filename = this.currentResult.output_file;
+            const link = document.createElement('a');
+            link.href = `/api/download/${filename}`;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            this.showError('No transcript available to download');
+        }
+    }
+
     showResults(result) {
         const resultsSection = document.getElementById('resultsSection');
         const resultSummary = document.getElementById('resultSummary');
@@ -488,6 +532,14 @@ function refreshStatus() {
 
 function cancelTranscription() {
     app.cancelTranscription();
+}
+
+function viewTranscript() {
+    app.viewTranscript();
+}
+
+function downloadTranscript() {
+    app.downloadTranscript();
 }
 
 // Initialize app when DOM is loaded
