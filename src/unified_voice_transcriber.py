@@ -264,15 +264,10 @@ class UnifiedVoiceTranscriber:
             if self.enable_speaker_diarization:
                 speaker_segments = self.perform_speaker_diarization(audio_path)
             
-            # Transcribe the audio with specified parameters
+            # Transcribe the audio with supported parameters
             transcribe_kwargs = {
-                'task': self.task,
                 'word_timestamps': True,
-                'temperature': temperature,
-                'beam_size': beam_size,
-                'best_of': best_of,
-                'patience': patience,
-                'length_penalty': length_penalty
+                'temperature': temperature
             }
             
             # Set language if specified
@@ -280,6 +275,21 @@ class UnifiedVoiceTranscriber:
                 transcribe_kwargs['language'] = language
             else:
                 transcribe_kwargs['language'] = None  # Auto-detect
+            
+            # Log unsupported parameters for user awareness
+            unsupported_params = []
+            if beam_size != 5:
+                unsupported_params.append(f"beam_size={beam_size}")
+            if best_of != 1:
+                unsupported_params.append(f"best_of={best_of}")
+            if patience != 1.0:
+                unsupported_params.append(f"patience={patience}")
+            if length_penalty != 1.0:
+                unsupported_params.append(f"length_penalty={length_penalty}")
+            
+            if unsupported_params:
+                logger.warning(f"Parameters not supported by current Whisper version: {', '.join(unsupported_params)}")
+                logger.info("Using default values for unsupported parameters")
             
             result = self.model.transcribe(audio_path, **transcribe_kwargs)
             
