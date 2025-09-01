@@ -189,6 +189,68 @@ body {
     font-size: 0.9rem;
 }
 
+/* Performance Guide */
+.performance-guide {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.performance-guide h3 {
+    margin: 0 0 16px 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.performance-guide h3 i {
+    color: #667eea;
+}
+
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.performance-item {
+    padding: 16px;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid transparent;
+}
+
+.performance-item.fast {
+    background: #f0fff4;
+    border-color: #9ae6b4;
+}
+
+.performance-item.balanced {
+    background: #fffbeb;
+    border-color: #f6e05e;
+}
+
+.performance-item.thorough {
+    background: #fed7d7;
+    border-color: #feb2b2;
+}
+
+.performance-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.performance-desc {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
 /* Options Container */
 .options-container {
     display: flex;
@@ -199,77 +261,68 @@ body {
 .option-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
-    transition: all 0.3s ease;
+    gap: 12px;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .option-group:hover {
-    background: #f0f4ff;
     border-color: #667eea;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 .option-group label {
-    font-weight: 500;
-    color: #333;
+    font-weight: 600;
+    color: #2d3748;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.option-group label i {
+    color: #667eea;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
 }
 
 .option-description {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 0.875rem;
+    color: #718096;
     margin: 0;
-    line-height: 1.4;
-}
-
-/* Performance indicators */
-.option-group option {
-    font-size: 0.95rem;
-    padding: 8px 12px;
-}
-
-.option-group select option[value="tiny"],
-.option-group select option[value="1"],
-.option-group select option[value="0.0"],
-.option-group select option[value="0.5"] {
-    background: #e8f5e8;
-}
-
-.option-group select option[value="base"],
-.option-group select option[value="5"],
-.option-group select option[value="0.2"],
-.option-group select option[value="1.0"] {
-    background: #fff3cd;
-}
-
-.option-group select option[value="large"],
-.option-group select option[value="10"],
-.option-group select option[value="0.4"],
-.option-group select option[value="2.0"] {
-    background: #f8d7da;
+    line-height: 1.5;
+    font-style: italic;
 }
 
 /* Form Elements */
+.option-group select option {
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    color: #2d3748;
+}
+
 .form-select {
-    padding: 12px 16px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
     font-size: 1rem;
     background: white;
-    transition: border-color 0.3s ease;
+    transition: all 0.2s ease;
+    color: #374151;
+    font-weight: 500;
 }
 
 .form-select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: #fafafa;
 }
 
 /* Checkbox */
