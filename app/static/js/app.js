@@ -434,6 +434,10 @@ class VoiceTranscriberApp {
                 <i class="fas fa-file-alt"></i>
                 <strong>Output File:</strong> ${result.output_file}
             </div>
+            <div class="result-item">
+                <i class="fas fa-eye text-info"></i>
+                <strong>Opening transcript viewer...</strong>
+            </div>
         `;
 
         resultSummary.innerHTML = summaryHtml;
@@ -441,6 +445,13 @@ class VoiceTranscriberApp {
 
         // Store result for download
         this.currentResult = result;
+        
+        // Automatically show transcript when transcription completes
+        if (result.output_file) {
+            setTimeout(() => {
+                this.viewTranscript();
+            }, 1500); // Small delay to let the results section appear first
+        }
     }
 
     hideResults() {
