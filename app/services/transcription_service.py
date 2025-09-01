@@ -97,7 +97,8 @@ class TranscriptionService:
             result = transcriber.transcribe_audio(
                 filepath, 
                 language=language,
-                temperature=temperature
+                temperature=temperature,
+                output_dir="transcriptions"  # Specify output directory
             )
             
             if result:

@@ -200,8 +200,20 @@ def cancel_job(job_id):
 def download_file(filename):
     """Download transcription file"""
     try:
-        filepath = os.path.join('transcriptions', filename)
-        if not os.path.exists(filepath):
+        # Try multiple possible locations for transcript files
+        possible_paths = [
+            os.path.join('transcriptions', filename),  # Project root transcriptions folder
+            filename,  # Project root directly
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'transcriptions', filename)  # App relative path
+        ]
+        
+        filepath = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                filepath = path
+                break
+        
+        if not filepath:
             return jsonify({'error': 'File not found'}), 404
         
         return send_file(filepath, as_attachment=True)
@@ -214,8 +226,20 @@ def download_file(filename):
 def get_transcript(filename):
     """Get transcription content for viewing"""
     try:
-        filepath = os.path.join('transcriptions', filename)
-        if not os.path.exists(filepath):
+        # Try multiple possible locations for transcript files
+        possible_paths = [
+            os.path.join('transcriptions', filename),  # Project root transcriptions folder
+            filename,  # Project root directly
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'transcriptions', filename)  # App relative path
+        ]
+        
+        filepath = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                filepath = path
+                break
+        
+        if not filepath:
             return jsonify({'error': 'File not found'}), 404
         
         with open(filepath, 'r', encoding='utf-8') as f:
