@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  voice-transcriber:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./transcriptions:/app/transcriptions
+      - ./logs:/app/logs
+    environment:
+      - FLASK_ENV=production
+      - PYTHONPATH=/app/src
+    restart: unless-stopped

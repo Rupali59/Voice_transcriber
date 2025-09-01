@@ -1,0 +1,29 @@
+# Refactored Voice Transcriber Web Application Requirements
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+python-socketio==5.9.0
+python-engineio==4.7.1
+Werkzeug==2.3.7
+
+# Existing requirements from the main project
+torch>=1.9.0
+torchaudio>=0.9.0
+openai-whisper>=20231117
+pyannote.audio>=3.1.0
+librosa>=0.9.0
+soundfile>=0.10.0
+numpy>=1.21.0
+scipy>=1.7.0
+pandas>=1.3.0
+matplotlib>=3.4.0
+seaborn>=0.11.0
+tqdm>=4.62.0
+pathlib2>=2.3.0
+typer>=0.4.0
+rich>=12.0.0
+python-dotenv>=0.19.0
+pydantic>=1.8.0
+click>=8.0.0
+
+# Additional dependencies for refactored app
+dataclasses-json>=0.5.7
