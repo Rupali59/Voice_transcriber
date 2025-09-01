@@ -1,0 +1,41 @@
+# Voice Transcriber Configuration
+# Copy this file to .env and fill in your values
+
+# API Keys
+OPENAI_API_KEY=your_openai_api_key_here
+WHISPER_MODEL_SIZE=medium
+
+# Input Configuration
+INPUT_WATCH_DIRS=/path/to/input1,/path/to/input2
+INPUT_FILE_PATTERNS=*.m4a,*.mp3,*.wav,*.aac,*.flac
+INPUT_POLL_INTERVAL=30
+
+# Output Configuration
+OUTPUT_BASE_DIR=/path/to/transcriptions
+OUTPUT_FORMAT=markdown
+OUTPUT_INCLUDE_METADATA=true
+OUTPUT_INCLUDE_SPEAKERS=true
+
+# Processing Configuration
+ENABLE_SPEAKER_DIARIZATION=true
+ENABLE_LANGUAGE_DETECTION=true
+ENABLE_PARTIAL_TRANSCRIPTION=true
+BATCH_SIZE=3
+MAX_CONCURRENT_PROCESSES=2
+
+# Performance Configuration
+AUDIO_CHUNK_SIZE=30
+AUDIO_OVERLAP=5
+SILENCE_THRESHOLD=-40
+SAMPLE_RATE=16000
+
+# Background Processing
+ENABLE_BACKGROUND_PROCESSING=true
+PROCESSING_QUEUE_SIZE=100
+RETRY_ATTEMPTS=3
+RETRY_DELAY=60
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/transcriber.log
+ENABLE_PROGRESS_BARS=true

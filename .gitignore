@@ -1,0 +1,66 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env
+
+# Python virtual environment files
+venv/
+env/
+ENV/
+.venv/
+.env
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environment activation scripts
+venv/bin/
+venv/Scripts/
+venv/include/
+venv/lib/
+venv/share/
+venv/pyvenv.cfg
+
+# Python cache and compiled files
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Transcription outputs
+transcriptions/
