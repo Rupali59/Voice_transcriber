@@ -132,11 +132,18 @@
 
             <!-- Action Section -->
             <section class="action-section">
-                <div class="card">
+                <div class="card action-card">
                     <div class="card-body text-center">
-                        <button class="btn btn-primary btn-lg" id="transcribeBtn" onclick="startTranscription()" disabled>
-                            <i class="fas fa-play"></i> Start Transcription
-                        </button>
+                        <div class="action-content">
+                            <div class="action-icon">
+                                <i class="fas fa-microphone-alt"></i>
+                            </div>
+                            <h3 class="action-title">Ready to Transcribe?</h3>
+                            <p class="action-subtitle">Upload your audio file and click below to start</p>
+                            <button class="btn btn-primary btn-lg" id="transcribeBtn" onclick="startTranscription()" disabled>
+                                <i class="fas fa-play"></i> Start Transcription
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
