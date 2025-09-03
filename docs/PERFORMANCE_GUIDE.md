@@ -24,7 +24,7 @@ Optimization strategies and performance tuning for the Voice Transcriber applica
 
 ## 🚀 Optimization Strategies
 
-### 1. Model Selection
+### 1. Model Selection & Caching
 
 Choose the right Whisper model for your needs:
 
@@ -37,6 +37,12 @@ Choose the right Whisper model for your needs:
 | **Large** | 0.5x real-time | 8GB | 95% | Critical accuracy |
 
 **Recommendation**: Start with **Base** model for best balance.
+
+#### Model Caching Benefits
+- **Faster startup**: Models loaded once and reused
+- **Memory efficiency**: Automatic cleanup of unused models
+- **Better performance**: No model reloading between jobs
+- **GPU optimization**: Automatic GPU/CPU device selection
 
 ### 2. System Resource Optimization
 

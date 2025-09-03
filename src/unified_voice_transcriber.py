@@ -64,11 +64,29 @@ class UnifiedVoiceTranscriber:
         }
         
     def load_model(self):
-        """Load the Whisper model"""
+        """Load the Whisper model using cache"""
         try:
+            # Import model cache
+            import sys
+            from pathlib import Path
+            sys.path.insert(0, str(Path(__file__).parent.parent / "app" / "services"))
+            
+            from model_cache import get_model_cache
+            
             logger.info(f"Loading Whisper model: {self.model_size}")
+            model_cache = get_model_cache()
+            self.model = model_cache.get_model(self.model_size)
+            
+            if self.model:
+                logger.info("Model loaded successfully from cache")
+            else:
+                raise Exception("Failed to load model from cache")
+                
+        except ImportError:
+            # Fallback to direct loading if cache not available
+            logger.warning("Model cache not available, loading model directly")
             self.model = whisper.load_model(self.model_size)
-            logger.info("Model loaded successfully")
+            logger.info("Model loaded successfully (direct)")
         except Exception as e:
             logger.error(f"Error loading model: {e}")
             raise

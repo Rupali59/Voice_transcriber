@@ -85,6 +85,13 @@ MAX_CONCURRENT_JOBS=5        # Max simultaneous jobs
 DEFAULT_MODEL_SIZE=base      # Default Whisper model
 ENABLE_SPEAKER_DIARIZATION=True # Default speaker diarization
 
+# Model Cache Configuration
+WHISPER_MODEL_CACHE_SIZE=3   # Max models to keep in memory
+MODEL_IDLE_TIMEOUT=1800      # Idle timeout in seconds (30 min)
+MODEL_CLEANUP_INTERVAL=300   # Cleanup interval in seconds (5 min)
+ENABLE_GPU_ACCELERATION=true # Use GPU if available
+PRELOAD_MODELS=base,small    # Models to preload on startup
+
 # File Management
 UPLOAD_FOLDER=uploads        # Upload directory
 TRANSCRIPTION_FOLDER=transcriptions # Output directory
@@ -141,24 +148,50 @@ class ProductionConfig(Config):
 
 ## 🧠 Transcription Service
 
+### Model Cache System
+
+The application uses an intelligent model caching system to optimize performance:
+
+```python
+class ModelCache:
+    """Singleton model cache manager"""
+    
+    def __init__(self):
+        self.models = {}  # Cached models
+        self.model_usage = {}  # Usage statistics
+        self.cache_config = {
+            'max_models': 3,  # Maximum cached models
+            'idle_timeout': 1800,  # 30 minutes
+            'cleanup_interval': 300,  # 5 minutes
+            'enable_gpu': True
+        }
+    
+    def get_model(self, model_size):
+        """Get cached model or load if not cached"""
+        if model_size in self.models:
+            self._update_usage(model_size)
+            return self.models[model_size]
+        return self._load_model(model_size)
+    
+    def _load_model(self, model_size):
+        """Load and cache a new model"""
+        device = "cuda" if self.cache_config['enable_gpu'] else "cpu"
+        model = whisper.load_model(model_size, device=device)
+        self.models[model_size] = model
+        return model
+```
+
 ### Whisper Model Integration
 
 ```python
 class TranscriptionService:
     def __init__(self):
-        self.models = {}
-        self.load_models()
-    
-    def load_models(self):
-        """Load Whisper models"""
-        model_sizes = ['tiny', 'base', 'small', 'medium', 'large']
-        for size in model_sizes:
-            self.models[size] = whisper.load_model(size)
+        self.model_cache = get_model_cache()
     
     def transcribe(self, audio_file, model_size='base', 
                    language='auto', enable_speaker_diarization=True):
-        """Transcribe audio file"""
-        model = self.models[model_size]
+        """Transcribe audio file using cached model"""
+        model = self.model_cache.get_model(model_size)
         result = model.transcribe(
             audio_file,
             language=language if language != 'auto' else None

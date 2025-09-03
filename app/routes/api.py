@@ -269,6 +269,42 @@ def get_available_models():
         ]
     })
 
+@api_bp.route('/cache/stats', methods=['GET'])
+def get_cache_stats():
+    """Get model cache statistics"""
+    try:
+        from app.services.model_cache import get_model_cache
+        cache = get_model_cache()
+        stats = cache.get_cache_stats()
+        return jsonify(stats)
+    except Exception as e:
+        current_app.logger.error(f"Cache stats error: {e}")
+        return jsonify({'error': 'Failed to get cache stats'}), 500
+
+@api_bp.route('/cache/clear', methods=['POST'])
+def clear_cache():
+    """Clear model cache"""
+    try:
+        from app.services.model_cache import get_model_cache
+        cache = get_model_cache()
+        cache.clear_cache()
+        return jsonify({'success': True, 'message': 'Cache cleared'})
+    except Exception as e:
+        current_app.logger.error(f"Cache clear error: {e}")
+        return jsonify({'error': 'Failed to clear cache'}), 500
+
+@api_bp.route('/cache/optimize', methods=['POST'])
+def optimize_memory():
+    """Optimize memory usage"""
+    try:
+        from app.services.model_cache import get_model_cache
+        cache = get_model_cache()
+        cache.optimize_memory()
+        return jsonify({'success': True, 'message': 'Memory optimized'})
+    except Exception as e:
+        current_app.logger.error(f"Memory optimization error: {e}")
+        return jsonify({'error': 'Failed to optimize memory'}), 500
+
 # Request Tracking Endpoints
 
 @api_bp.route('/requests')

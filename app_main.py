@@ -39,6 +39,18 @@ def main():
     print(f"🔧 Debug: {debug}")
     print("=" * 50)
     
+    # Preload models if configured
+    try:
+        preload_models = app.config.get('PRELOAD_MODELS', [])
+        if preload_models:
+            print(f"🔄 Preloading models: {preload_models}")
+            from app.services.model_cache import get_model_cache
+            cache = get_model_cache()
+            cache.preload_models(preload_models)
+            print("✅ Model preloading completed")
+    except Exception as e:
+        print(f"⚠️  Model preloading failed: {e}")
+    
     # Run the application
     socketio.run(
         app,

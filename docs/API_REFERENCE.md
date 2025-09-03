@@ -196,6 +196,61 @@ curl -X POST http://localhost:5001/api/upload \
 
 ---
 
+### 🗄️ Model Cache Management
+
+#### GET /api/cache/stats
+**Description**: Get model cache statistics
+
+**Response**:
+```json
+{
+  "cached_models": ["base", "small"],
+  "cache_size": 2,
+  "max_cache_size": 3,
+  "model_usage": {
+    "base": {
+      "first_used": "2024-01-01T12:00:00.000Z",
+      "last_used": "2024-01-01T12:30:00.000Z",
+      "access_count": 5,
+      "idle_time": 0
+    }
+  },
+  "memory_usage": {
+    "rss_mb": 2048.5,
+    "vms_mb": 4096.2,
+    "percent": 25.3
+  }
+}
+```
+
+---
+
+#### POST /api/cache/clear
+**Description**: Clear all cached models
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Cache cleared"
+}
+```
+
+---
+
+#### POST /api/cache/optimize
+**Description**: Optimize memory usage
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Memory optimized"
+}
+```
+
+---
+
 ## 🔌 WebSocket Events
 
 ### Connection

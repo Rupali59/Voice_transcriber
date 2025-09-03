@@ -23,6 +23,13 @@ class Config:
     JOB_CLEANUP_HOURS = int(os.environ.get('JOB_CLEANUP_HOURS', 1))
     FILE_CLEANUP_HOURS = int(os.environ.get('FILE_CLEANUP_HOURS', 24))
     
+    # Model Cache Configuration
+    WHISPER_MODEL_CACHE_SIZE = int(os.environ.get('WHISPER_MODEL_CACHE_SIZE', 3))
+    MODEL_IDLE_TIMEOUT = int(os.environ.get('MODEL_IDLE_TIMEOUT', 1800))  # 30 minutes
+    MODEL_CLEANUP_INTERVAL = int(os.environ.get('MODEL_CLEANUP_INTERVAL', 300))  # 5 minutes
+    ENABLE_GPU_ACCELERATION = os.environ.get('ENABLE_GPU_ACCELERATION', 'true').lower() == 'true'
+    PRELOAD_MODELS = os.environ.get('PRELOAD_MODELS', 'base,small').split(',')
+    
     # Logging Configuration
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_FILE = os.environ.get('LOG_FILE', 'logs/web_app.log')

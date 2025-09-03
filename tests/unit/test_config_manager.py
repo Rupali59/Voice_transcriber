@@ -84,13 +84,13 @@ LOG_LEVEL=DEBUG
         config = ConfigManager()
         
         # Test transcription defaults
-        self.assertEqual(config.transcription.whisper_model_size, 'large')  # From your .env file
+        self.assertEqual(config.transcription.whisper_model_size, 'medium')  # Default value
         self.assertTrue(config.transcription.enable_speaker_diarization)
-        self.assertFalse(config.transcription.enable_language_detection)  # From your .env file
+        self.assertTrue(config.transcription.enable_language_detection)  # Default value
         
         # Test performance defaults
-        self.assertEqual(config.performance.max_concurrent_processes, 2)  # From your .env file
-        self.assertEqual(config.performance.batch_size, 3)  # From your .env file
+        self.assertEqual(config.performance.max_concurrent_processes, 2)  # Default value
+        self.assertEqual(config.performance.batch_size, 3)  # Default value
         
         # Test input defaults
         self.assertIsInstance(config.input.file_patterns, list)
