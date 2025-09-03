@@ -201,6 +201,50 @@
                 </div>
             </section>
 
+            <!-- My Files Section -->
+            <section class="my-files-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-folder"></i> My Files</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshMyFiles()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="cleanupMyFiles()">
+                                <i class="fas fa-trash"></i> Cleanup All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="quota-info" id="quotaInfo">
+                            <div class="quota-item">
+                                <span class="quota-label">Files:</span>
+                                <span class="quota-value" id="quotaFiles">-</span>
+                            </div>
+                            <div class="quota-item">
+                                <span class="quota-label">Storage:</span>
+                                <span class="quota-value" id="quotaStorage">-</span>
+                            </div>
+                            <div class="quota-item">
+                                <span class="quota-label">24h Files:</span>
+                                <span class="quota-value" id="quota24hFiles">-</span>
+                            </div>
+                            <div class="quota-item">
+                                <span class="quota-label">24h Storage:</span>
+                                <span class="quota-value" id="quota24hStorage">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="files-list" id="filesList">
+                            <div class="loading-files">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Loading your files...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Results Section -->
             <section class="results-section" id="resultsSection" style="display: none;">
                 <div class="card">

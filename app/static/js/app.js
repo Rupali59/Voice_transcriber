@@ -14,6 +14,8 @@ class VoiceTranscriberApp {
         this.setupSocketConnection();
         this.setupFileUpload();
         this.setupEventListeners();
+        this.loadMyFiles();
+        this.loadQuotaInfo();
     }
 
     setupSocketConnection() {
@@ -118,6 +120,10 @@ class VoiceTranscriberApp {
                 this.uploadedFile = result;
                 this.displayFileInfo(result);
                 this.updateTranscribeButton();
+                this.showSuccess('File uploaded successfully!');
+                // Refresh file list and quota info
+                this.loadMyFiles();
+                this.loadQuotaInfo();
             } else {
                 this.showError(result.error || 'Upload failed');
             }
@@ -414,6 +420,238 @@ class VoiceTranscriberApp {
         }
     }
 
+    // File Management Methods
+    async loadMyFiles() {
+        try {
+            const response = await fetch('/api/my-files');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayMyFiles(data.files);
+            } else {
+                console.error('Failed to load files:', data.error);
+                this.showError('Failed to load your files');
+            }
+        } catch (error) {
+            console.error('Error loading files:', error);
+            this.showError('Error loading your files');
+        }
+    }
+
+    async loadQuotaInfo() {
+        try {
+            const response = await fetch('/api/my-quota');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayQuotaInfo(data.stats);
+            } else {
+                console.error('Failed to load quota info:', data.error);
+            }
+        } catch (error) {
+            console.error('Error loading quota info:', error);
+        }
+    }
+
+    displayMyFiles(files) {
+        const filesList = document.getElementById('filesList');
+        
+        if (files.length === 0) {
+            filesList.innerHTML = `
+                <div class="no-files">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No files uploaded yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        filesList.innerHTML = files.map(file => {
+            const fileIcon = this.getFileIcon(file.original_name);
+            const uploadDate = new Date(file.upload_time).toLocaleString();
+            const fileSize = this.formatFileSize(file.size_mb);
+            
+            return `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-icon ${fileIcon.type}">
+                            <i class="${fileIcon.icon}"></i>
+                        </div>
+                        <div class="file-details">
+                            <h6>${file.original_name}</h6>
+                            <p>${fileSize} • Uploaded ${uploadDate}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn btn-sm btn-outline-info" onclick="app.downloadFile('${file.filename}')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="app.deleteFile('${file.filename}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    displayQuotaInfo(stats) {
+        const quota = stats.quota;
+        if (!quota) return;
+
+        // Update quota displays
+        document.getElementById('quotaFiles').textContent = `${quota.total_files} / ${stats.limits.max_files_per_ip}`;
+        document.getElementById('quotaStorage').textContent = `${quota.total_size_mb.toFixed(1)} MB / ${stats.limits.max_size_mb_per_ip} MB`;
+        document.getElementById('quota24hFiles').textContent = `${quota.file_count_24h} / ${stats.limits.max_files_24h_per_ip}`;
+        document.getElementById('quota24hStorage').textContent = `${quota.size_mb_24h.toFixed(1)} MB / ${stats.limits.max_size_24h_mb_per_ip} MB`;
+
+        // Add warning styles if approaching limits
+        this.updateQuotaWarnings(quota, stats.limits);
+    }
+
+    updateQuotaWarnings(quota, limits) {
+        const quotaItems = document.querySelectorAll('.quota-item');
+        
+        // Check file quota
+        const fileUsage = quota.total_files / limits.max_files_per_ip;
+        if (fileUsage > 0.8) {
+            quotaItems[0].classList.add(fileUsage > 0.9 ? 'quota-critical' : 'quota-warning');
+            document.getElementById('quotaFiles').classList.add(fileUsage > 0.9 ? 'critical' : 'warning');
+        }
+
+        // Check storage quota
+        const storageUsage = quota.total_size_mb / limits.max_size_mb_per_ip;
+        if (storageUsage > 0.8) {
+            quotaItems[1].classList.add(storageUsage > 0.9 ? 'quota-critical' : 'quota-warning');
+            document.getElementById('quotaStorage').classList.add(storageUsage > 0.9 ? 'critical' : 'warning');
+        }
+
+        // Check 24h file quota
+        const file24hUsage = quota.file_count_24h / limits.max_files_24h_per_ip;
+        if (file24hUsage > 0.8) {
+            quotaItems[2].classList.add(file24hUsage > 0.9 ? 'quota-critical' : 'quota-warning');
+            document.getElementById('quota24hFiles').classList.add(file24hUsage > 0.9 ? 'critical' : 'warning');
+        }
+
+        // Check 24h storage quota
+        const storage24hUsage = quota.size_mb_24h / limits.max_size_24h_mb_per_ip;
+        if (storage24hUsage > 0.8) {
+            quotaItems[3].classList.add(storage24hUsage > 0.9 ? 'quota-critical' : 'quota-warning');
+            document.getElementById('quota24hStorage').classList.add(storage24hUsage > 0.9 ? 'critical' : 'warning');
+        }
+    }
+
+    getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const audioExts = ['wav', 'mp3', 'm4a', 'flac', 'ogg', 'wma', 'aac'];
+        const videoExts = ['mp4', 'avi', 'mov', 'mkv', 'webm'];
+        
+        if (audioExts.includes(ext)) {
+            return { type: 'audio', icon: 'fas fa-music' };
+        } else if (videoExts.includes(ext)) {
+            return { type: 'video', icon: 'fas fa-video' };
+        } else {
+            return { type: 'other', icon: 'fas fa-file' };
+        }
+    }
+
+    formatFileSize(sizeMB) {
+        if (sizeMB < 1) {
+            return `${(sizeMB * 1024).toFixed(0)} KB`;
+        } else if (sizeMB < 1024) {
+            return `${sizeMB.toFixed(1)} MB`;
+        } else {
+            return `${(sizeMB / 1024).toFixed(1)} GB`;
+        }
+    }
+
+    async downloadFile(filename) {
+        try {
+            window.open(`/download/${filename}`, '_blank');
+        } catch (error) {
+            console.error('Error downloading file:', error);
+            this.showError('Error downloading file');
+        }
+    }
+
+    async deleteFile(filename) {
+        if (!confirm('Are you sure you want to delete this file?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/my-files/${filename}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showSuccess('File deleted successfully');
+                this.loadMyFiles();
+                this.loadQuotaInfo();
+            } else {
+                this.showError(data.error || 'Failed to delete file');
+            }
+        } catch (error) {
+            console.error('Error deleting file:', error);
+            this.showError('Error deleting file');
+        }
+    }
+
+    async cleanupMyFiles() {
+        if (!confirm('Are you sure you want to delete ALL your files? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/my-files/cleanup', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showSuccess(`Cleaned up ${data.deleted_count} files`);
+                this.loadMyFiles();
+                this.loadQuotaInfo();
+            } else {
+                this.showError(data.error || 'Failed to cleanup files');
+            }
+        } catch (error) {
+            console.error('Error cleaning up files:', error);
+            this.showError('Error cleaning up files');
+        }
+    }
+
+    showSuccess(message) {
+        this.showNotification(message, 'success');
+    }
+
+    showError(message) {
+        this.showNotification(message, 'error');
+    }
+
+    showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => notification.classList.add('show'), 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
     showResults(result) {
         const resultsSection = document.getElementById('resultsSection');
         const resultSummary = document.getElementById('resultSummary');
@@ -556,6 +794,16 @@ function viewTranscript(filename = null) {
 
 function downloadTranscript() {
     app.downloadTranscript();
+}
+
+// File Management Functions
+function refreshMyFiles() {
+    app.loadMyFiles();
+    app.loadQuotaInfo();
+}
+
+function cleanupMyFiles() {
+    app.cleanupMyFiles();
 }
 
 // Initialize app when DOM is loaded
