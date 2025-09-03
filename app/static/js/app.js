@@ -167,10 +167,18 @@ class VoiceTranscriberApp {
     }
 
     async startTranscription() {
+        // Validate file input first
+        if (!this.validateFileInput()) {
+            return;
+        }
+        
         if (!this.uploadedFile) {
             this.showError('Please select a file first');
             return;
         }
+        
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        this.showLoading(transcribeBtn);
 
         try {
             const modelSize = document.getElementById('modelSelect').value;
@@ -202,10 +210,12 @@ class VoiceTranscriberApp {
                 this.startStatusRefresh();
             } else {
                 this.showError(result.error || 'Failed to start transcription');
+                this.hideLoading(transcribeBtn);
             }
         } catch (error) {
             console.error('Transcription start error:', error);
             this.showError('Failed to start transcription. Please try again.');
+            this.hideLoading(transcribeBtn);
         }
     }
 
@@ -675,6 +685,88 @@ class VoiceTranscriberApp {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
         }, 3000);
+    }
+
+    // Error handling functions
+    showError(message, element = null) {
+        if (element) {
+            element.classList.add('error-state');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            
+            // Insert after the element
+            element.parentNode.insertBefore(errorDiv, element.nextSibling);
+            
+            // Remove error state after 5 seconds
+            setTimeout(() => {
+                element.classList.remove('error-state');
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        } else {
+            this.showNotification(message, 'error');
+        }
+    }
+
+    showSuccess(message, element = null) {
+        if (element) {
+            element.classList.add('success-state');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            
+            // Insert after the element
+            element.parentNode.insertBefore(successDiv, element.nextSibling);
+            
+            // Remove success state after 3 seconds
+            setTimeout(() => {
+                element.classList.remove('success-state');
+                if (successDiv.parentNode) {
+                    successDiv.parentNode.removeChild(successDiv);
+                }
+            }, 3000);
+        } else {
+            this.showNotification(message, 'success');
+        }
+    }
+
+    showLoading(element) {
+        element.classList.add('loading-state');
+        element.disabled = true;
+    }
+
+    hideLoading(element) {
+        element.classList.remove('loading-state');
+        element.disabled = false;
+    }
+
+    // Form validation
+    validateFileInput() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            this.showError('Please select a file to upload', fileInput);
+            return false;
+        }
+        
+        // Check file size (500MB limit)
+        const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+        if (file.size > maxSize) {
+            this.showError('File size must be less than 500MB', fileInput);
+            return false;
+        }
+        
+        // Check file type
+        const allowedTypes = ['audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/mp4', 'audio/m4a', 'audio/flac', 'audio/ogg', 'audio/wma', 'audio/aac'];
+        if (!allowedTypes.includes(file.type)) {
+            this.showError('Please select a valid audio file (WAV, MP3, M4A, FLAC, OGG, WMA, AAC, MP4)', fileInput);
+            return false;
+        }
+        
+        return true;
     }
 
     async checkExistingTranscripts() {

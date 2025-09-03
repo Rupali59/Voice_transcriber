@@ -9,17 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <!-- Floating Particles -->
-    <div class="particles-container">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
+
 
     <div class="container">
         <!-- Header -->
@@ -140,9 +130,19 @@
                             </div>
                             <h3 class="action-title">Ready to Transcribe?</h3>
                             <p class="action-subtitle">Upload your audio file and click below to start</p>
-                            <button class="btn btn-primary btn-lg" id="transcribeBtn" onclick="startTranscription()" disabled>
-                                <i class="fas fa-play"></i> Start Transcription
+                            <button 
+                                class="btn btn-primary btn-lg" 
+                                id="transcribeBtn" 
+                                onclick="startTranscription()" 
+                                disabled
+                                aria-label="Start audio transcription process"
+                                aria-describedby="transcribe-help"
+                            >
+                                <i class="fas fa-play" aria-hidden="true"></i> Start Transcription
                             </button>
+                            <div id="transcribe-help" class="sr-only">
+                                Click to begin transcribing your uploaded audio file
+                            </div>
                         </div>
                     </div>
                 </div>
