@@ -68,29 +68,62 @@ def upload_file():
 def start_transcription():
     """Start transcription process"""
     try:
-        data = request.get_json()
-        filename = data.get('filename')
-        model_size = data.get('model_size', 'base')
-        enable_speaker_diarization = data.get('enable_speaker_diarization', True)
-        language = data.get('language', 'auto')
-        temperature = data.get('temperature', 0.2)
-        
-        if not filename:
-            return jsonify({'error': 'No filename provided'}), 400
-        
-        # Create FileUpload object from filename
-        from app.models.file_upload import FileUpload
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        
-        if not os.path.exists(filepath):
-            return jsonify({'error': 'File not found'}), 404
-        
-        file_upload = FileUpload(
-            filename=filename,
-            original_name=filename,  # This would be stored in a real app
-            filepath=filepath,
-            size_bytes=os.path.getsize(filepath)
-        )
+        # Handle both form data and JSON data
+        if request.content_type and 'application/json' in request.content_type:
+            # Handle JSON data (legacy)
+            data = request.get_json()
+            filename = data.get('filename')
+            model_size = data.get('model_size', 'base')
+            enable_speaker_diarization = data.get('enable_speaker_diarization', True)
+            language = data.get('language', 'auto')
+            temperature = data.get('temperature', 0.2)
+            
+            if not filename:
+                return jsonify({'error': 'No filename provided'}), 400
+            
+            # Create FileUpload object from filename
+            from app.models.file_upload import FileUpload
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            
+            if not os.path.exists(filepath):
+                return jsonify({'error': 'File not found'}), 404
+                
+            file_upload = FileUpload(
+                filename=filename,
+                original_name=filename,  # This would be stored in a real app
+                filepath=filepath,
+                size_bytes=os.path.getsize(filepath)
+            )
+        else:
+            # Handle form data (new design)
+            if 'file' not in request.files:
+                return jsonify({'error': 'No file provided'}), 400
+            
+            file = request.files['file']
+            if file.filename == '':
+                return jsonify({'error': 'No file selected'}), 400
+            
+            # Get client IP address
+            client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+            if ',' in client_ip:
+                client_ip = client_ip.split(',')[0].strip()
+            
+            # Get IP file service from global instance
+            from app import get_ip_file_service
+            ip_file_service = get_ip_file_service()
+            
+            # Save uploaded file with IP tracking and DoS protection
+            file_upload = ip_file_service.save_uploaded_file(
+                file, 
+                current_app.config['MAX_CONTENT_LENGTH'],
+                client_ip
+            )
+            
+            # Get form parameters
+            model_size = request.form.get('model', 'base')
+            enable_speaker_diarization = request.form.get('diarization', 'false').lower() == 'true'
+            language = request.form.get('language', 'auto')
+            temperature = float(request.form.get('temperature', 0.2))
         
         # Generate job ID
         job_id = str(uuid.uuid4())
@@ -101,7 +134,10 @@ def start_transcription():
         request_tracker = get_request_tracker()
         
         # Start tracking this request
-        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if 'client_ip' not in locals():
+            client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+            if ',' in client_ip:
+                client_ip = client_ip.split(',')[0].strip()
         user_agent = request.headers.get('User-Agent', 'unknown')
         request_id = request_tracker.start_request(
             job_id=job_id,
@@ -700,3 +736,75 @@ def set_user_properties():
     except Exception as e:
         current_app.logger.error(f"Set user properties error: {e}")
         return jsonify({'error': 'Failed to set user properties'}), 500
+
+@api_bp.route('/transcripts', methods=['GET'])
+def get_transcripts():
+    """Get list of existing transcripts"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        # Get IP file service from global instance
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        # Get files for this IP
+        files = ip_file_service.get_files_by_ip(client_ip)
+        
+        # Filter for transcript files (files that have been transcribed)
+        transcripts = []
+        for file_record in files:
+            # Check if this file has a corresponding transcript
+            transcript_path = os.path.join(current_app.config['TRANSCRIPTION_FOLDER'], f"{file_record.filename}.txt")
+            if os.path.exists(transcript_path):
+                transcripts.append({
+                    'filename': f"{file_record.filename}.txt",
+                    'original_name': file_record.original_name,
+                    'created_at': file_record.uploaded_at.isoformat(),
+                    'size': os.path.getsize(transcript_path)
+                })
+        
+        return jsonify({
+            'success': True,
+            'transcripts': transcripts
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get transcripts error: {e}")
+        return jsonify({'error': 'Failed to get transcripts'}), 500
+
+@api_bp.route('/transcripts/<filename>', methods=['GET'])
+def download_transcript(filename):
+    """Download a transcript file"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        # Get IP file service from global instance
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        # Check if user has access to this file
+        files = ip_file_service.get_files_by_ip(client_ip)
+        file_names = [f.filename for f in files]
+        
+        # Remove .txt extension to match original filename
+        original_filename = filename.replace('.txt', '')
+        if original_filename not in file_names:
+            return jsonify({'error': 'File not found or access denied'}), 404
+        
+        # Construct file path
+        file_path = os.path.join(current_app.config['TRANSCRIPTION_FOLDER'], filename)
+        
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'Transcript file not found'}), 404
+        
+        return send_file(file_path, as_attachment=True, download_name=filename)
+        
+    except Exception as e:
+        current_app.logger.error(f"Download transcript error: {e}")
+        return jsonify({'error': 'Failed to download transcript'}), 500
