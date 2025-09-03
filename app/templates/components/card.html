@@ -1,0 +1,29 @@
+<!-- Card Component -->
+<div class="
+  bg-white rounded-xl shadow-md-2
+  border border-surface-200
+  transition-shadow duration-200
+  hover:shadow-md-4
+  {{ class }}
+">
+  {% if header %}
+    <div class="px-6 py-4 border-b border-surface-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-surface-900 flex items-center gap-2">
+          {% if icon %}
+            <span class="material-icons text-primary-500">{{ icon }}</span>
+          {% endif %}
+          {{ title }}
+        </h3>
+        {% if actions %}
+          <div class="flex gap-2">
+            {{ actions }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+  <div class="p-6">
+    {{ content }}
+  </div>
+</div>

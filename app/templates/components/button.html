@@ -1,0 +1,16 @@
+<!-- Button Component -->
+<button class="
+  inline-flex items-center justify-center gap-2
+  px-6 py-3 rounded-lg font-medium text-sm
+  transition-all duration-200 ease-in-out
+  focus:outline-none focus:ring-2 focus:ring-offset-2
+  disabled:opacity-50 disabled:cursor-not-allowed
+  {{ variant_classes }}
+  {{ size_classes }}
+  {{ class }}
+" {{ attributes }}>
+  {% if icon %}
+    <span class="material-icons text-lg">{{ icon }}</span>
+  {% endif %}
+  {{ text }}
+</button>

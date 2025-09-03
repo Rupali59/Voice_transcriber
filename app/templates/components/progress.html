@@ -1,0 +1,19 @@
+<!-- Progress Component -->
+<div class="w-full">
+  <div class="flex justify-between items-center mb-2">
+    <span class="text-sm font-medium text-surface-700">{{ label }}</span>
+    <span class="text-sm text-surface-500">{{ value }}%</span>
+  </div>
+  <div class="w-full bg-surface-200 rounded-full h-2 overflow-hidden">
+    <div class="
+      h-full bg-gradient-to-r from-primary-500 to-primary-400
+      rounded-full transition-all duration-300 ease-out
+      relative overflow-hidden
+    " style="width: {{ value }}%">
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer"></div>
+    </div>
+  </div>
+  {% if description %}
+    <p class="text-xs text-surface-500 mt-1">{{ description }}</p>
+  {% endif %}
+</div>

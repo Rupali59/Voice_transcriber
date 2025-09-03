@@ -1,0 +1,45 @@
+<!-- Upload Area Component -->
+<div class="
+  border-2 border-dashed border-surface-300 rounded-xl p-12 text-center
+  hover:border-primary-400 hover:bg-primary-50
+  transition-all duration-200 cursor-pointer
+  group
+" id="uploadArea">
+  <div class="space-y-4">
+    <div class="flex justify-center">
+      <span class="material-icons text-6xl text-primary-500 group-hover:scale-110 transition-transform duration-200">
+        cloud_upload
+      </span>
+    </div>
+    <div>
+      <h4 class="text-xl font-medium text-surface-900 mb-2">
+        Drop your audio file here
+      </h4>
+      <p class="text-surface-600 mb-4">
+        or <span class="text-primary-600 font-medium cursor-pointer hover:underline">browse files</span>
+      </p>
+      <div class="text-sm text-surface-500 space-y-1">
+        <p>Supported: WAV, MP3, M4A, FLAC, OGG, WMA, AAC, MP4</p>
+        <p>Max file size: 500MB</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- File Info (Hidden by default) -->
+<div class="hidden mt-6" id="fileInfo">
+  <div class="bg-primary-50 border border-primary-200 rounded-lg p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="material-icons text-primary-500">audiotrack</span>
+        <div>
+          <h5 class="font-medium text-surface-900" id="fileName">filename.mp3</h5>
+          <p class="text-sm text-surface-600" id="fileSize">2.5 MB</p>
+        </div>
+      </div>
+      <button class="p-2 rounded-lg hover:bg-primary-100 transition-colors" onclick="clearFile()">
+        <span class="material-icons text-primary-600">close</span>
+      </button>
+    </div>
+  </div>
+</div>

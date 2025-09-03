@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>EchoScribe - AI-Powered Audio Transcription | Free Online Speech-to-Text</title>
+    <meta name="title" content="EchoScribe - AI-Powered Audio Transcription | Free Online Speech-to-Text">
+    <meta name="description" content="Transform your audio files into text with EchoScribe's advanced AI transcription service. Support for 99+ languages, speaker diarization, and multiple audio formats. Fast, accurate, and completely free.">
+    <meta name="keywords" content="audio transcription, speech to text, AI transcription, voice recognition, audio converter, speech recognition, transcription service, free transcription, online transcription, audio to text, voice to text, speech converter, audio processing, AI voice recognition, multilingual transcription">
+    <meta name="author" content="Tathya">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="EchoScribe - AI-Powered Audio Transcription | Free Online Speech-to-Text">
+    <meta property="og:description" content="Transform your audio files into text with EchoScribe's advanced AI transcription service. Support for 99+ languages, speaker diarization, and multiple audio formats. Fast, accurate, and completely free.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/echoscribe-og-image.png', _external=True) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="EchoScribe">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="EchoScribe - AI-Powered Audio Transcription | Free Online Speech-to-Text">
+    <meta property="twitter:description" content="Transform your audio files into text with EchoScribe's advanced AI transcription service. Support for 99+ languages, speaker diarization, and multiple audio formats. Fast, accurate, and completely free.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/echoscribe-og-image.png', _external=True) }}">
+    <meta property="twitter:creator" content="@Tathya">
+    <meta property="twitter:site" content="@EchoScribe">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#1976d2">
+    <meta name="msapplication-TileColor" content="#1976d2">
+    <meta name="application-name" content="EchoScribe">
+    <meta name="apple-mobile-web-app-title" content="EchoScribe">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request.url }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    
+    <!-- Material Design Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Material Design Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Material Design Components CSS -->
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <!-- Custom Material Design Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/material-style.css') }}">
+    
+    <!-- SEO and Accessibility Styles -->
+    <style>
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .sr-only:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: inherit;
+            margin: inherit;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
+    </style>
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "EchoScribe",
+        "description": "AI-powered audio transcription service that converts speech to text with support for 99+ languages, speaker diarization, and multiple audio formats.",
+        "url": "{{ request.url_root }}",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@type": "Person",
+            "name": "Tathya"
+        },
+        "featureList": [
+            "AI-powered transcription",
+            "99+ language support",
+            "Speaker diarization",
+            "Multiple audio format support",
+            "Real-time progress tracking",
+            "Free to use",
+            "High accuracy transcription",
+            "Batch processing"
+        ],
+        "screenshot": "{{ url_for('static', filename='images/echoscribe-screenshot.png', _external=True) }}",
+        "softwareVersion": "1.0.0",
+        "datePublished": "2025-01-01",
+        "dateModified": "2025-01-01",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "softwareRequirements": "Web browser",
+        "memoryRequirements": "512MB RAM",
+        "storageRequirements": "500MB free space",
+        "permissions": "Microphone access for audio recording",
+        "applicationSubCategory": "Transcription Software"
+    }
+    </script>
+    
+    <!-- Additional Structured Data for Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "EchoScribe",
+        "url": "{{ request.url_root }}",
+        "logo": "{{ url_for('static', filename='images/logo.png', _external=True) }}",
+        "description": "AI-powered audio transcription service providing fast, accurate, and free speech-to-text conversion.",
+        "foundingDate": "2025",
+        "founder": {
+            "@type": "Person",
+            "name": "Tathya"
+        },
+        "sameAs": [
+            "https://github.com/tathya/echoscribe"
+        ],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+        }
+    }
+    </script>
+    
+    <!-- FAQ Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What audio formats does EchoScribe support?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "EchoScribe supports WAV, MP3, M4A, FLAC, OGG, WMA, AAC, and MP4 audio formats with a maximum file size of 500MB."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How many languages does EchoScribe support?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "EchoScribe supports 99+ languages including English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Korean, Chinese, Hindi, and many more."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is EchoScribe free to use?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, EchoScribe is completely free to use with no registration required. You can transcribe unlimited audio files at no cost."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is speaker diarization?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Speaker diarization is a feature that identifies and separates different speakers in an audio file, making it easier to follow conversations and interviews."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How accurate is EchoScribe's transcription?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "EchoScribe uses advanced AI models (including Whisper) to provide highly accurate transcriptions. Accuracy depends on audio quality, language, and speaking clarity."
+                }
+            }
+        ]
+    }
+    </script>
+</head>
+<body>
+
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header" role="banner">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="material-icons" aria-hidden="true">mic</span>
+                    <h1>EchoScribe</h1>
+                </div>
+                <p class="subtitle">AI-Powered Audio Transcription with Real-time Progress</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" role="main">
+            <!-- Upload & Options Section -->
+            <section class="upload-section" aria-labelledby="upload-heading">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 id="upload-heading"><span class="material-icons" aria-hidden="true">upload</span> Upload Audio & Configure Transcription</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Upload Area -->
+                        <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="Upload audio file area">
+                            <div class="upload-content">
+                                <span class="material-icons upload-icon" aria-hidden="true">cloud_upload</span>
+                                <h3>Drop your audio file here</h3>
+                                <p>or <button type="button" class="upload-link" onclick="document.getElementById('fileInput').click()" aria-label="Browse files to upload">browse files</button></p>
+                                <p class="file-types">Supported: WAV, MP3, M4A, FLAC, OGG, WMA, AAC, MP4</p>
+                                <p class="file-limit">Max file size: 500MB</p>
+                            </div>
+                            <input type="file" id="fileInput" accept=".wav,.mp3,.m4a,.flac,.ogg,.wma,.aac,.mp4" style="display: none;" aria-label="Select audio file to upload">
+                        </div>
+                        
+                        <!-- File Info -->
+                        <div class="file-info" id="fileInfo" style="display: none;" role="region" aria-label="Selected file information">
+                            <div class="file-details">
+                                <span class="material-icons" aria-hidden="true">audiotrack</span>
+                                <div class="file-text">
+                                    <h4 id="fileName"></h4>
+                                    <p id="fileSize"></p>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="clearFile()" aria-label="Remove selected file">
+                                    <span class="material-icons" aria-hidden="true">close</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Transcription Options -->
+                        <fieldset class="options-container">
+                            <legend class="sr-only">Transcription Configuration Options</legend>
+                            <div class="options-row">
+                                <div class="option-group">
+                                    <label for="modelSelect">
+                                        <span class="material-icons" aria-hidden="true">psychology</span> AI Model
+                                    </label>
+                                    <select id="modelSelect" class="form-select" title="Speed: ⚡⚡⚡⚡⚡ | Processing: ⭐⭐" aria-describedby="model-help">
+                                        <option value="tiny" title="Speed: ⚡⚡⚡⚡⚡ | Processing: ⭐⭐">Tiny - Fastest</option>
+                                        <option value="base" selected title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐">Base - Balanced</option>
+                                        <option value="small" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">Small - Better</option>
+                                        <option value="medium" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐⭐⭐">Medium - High Quality</option>
+                                        <option value="large" title="Speed: ⚡ | Processing: ⭐⭐⭐⭐⭐">Large - Best</option>
+                                    </select>
+                                    <div id="model-help" class="sr-only">Choose AI model based on speed vs accuracy trade-off</div>
+                                </div>
+
+                                <div class="option-group">
+                                    <label for="languageSelect">
+                                        <span class="material-icons" aria-hidden="true">language</span> Language
+                                    </label>
+                                    <select id="languageSelect" class="form-select" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐" aria-describedby="language-help">
+                                        <option value="auto" selected title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">Auto-detect</option>
+                                        <option value="en" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">English</option>
+                                        <option value="hi" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">Hindi</option>
+                                        <option value="es" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">Spanish</option>
+                                        <option value="fr" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">French</option>
+                                        <option value="de" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">German</option>
+                                        <option value="it" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">Italian</option>
+                                        <option value="pt" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">Portuguese</option>
+                                        <option value="ru" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">Russian</option>
+                                        <option value="ja" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐">Japanese</option>
+                                        <option value="ko" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐">Korean</option>
+                                        <option value="zh" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐">Chinese</option>
+                                    </select>
+                                    <div id="language-help" class="sr-only">Select the language of your audio file or use auto-detect</div>
+                                </div>
+
+                                <div class="option-group checkbox-group">
+                                    <label class="checkbox-label" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐⭐" for="speakerDiarization">
+                                        <input type="checkbox" id="speakerDiarization" checked aria-describedby="speaker-help">
+                                        <span class="material-icons" aria-hidden="true">group</span> Speaker Diarization
+                                    </label>
+                                    <div id="speaker-help" class="sr-only">Enable to identify and separate different speakers in the audio</div>
+                                </div>
+
+                                <div class="option-group">
+                                    <label for="temperatureSelect">
+                                        <span class="material-icons" aria-hidden="true">thermostat</span> Temperature
+                                    </label>
+                                    <select id="temperatureSelect" class="form-select" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐" aria-describedby="temperature-help">
+                                        <option value="0.0" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">0.0 - Most consistent</option>
+                                        <option value="0.1" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">0.1 - Very consistent</option>
+                                        <option value="0.2" selected title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">0.2 - Balanced</option>
+                                        <option value="0.3" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐">0.3 - More creative</option>
+                                        <option value="0.4" title="Speed: ⚡ | Processing: ⭐⭐">0.4 - Most creative</option>
+                                    </select>
+                                    <div id="temperature-help" class="sr-only">Controls randomness in transcription - lower values are more consistent</div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Section -->
+            <section class="action-section" aria-labelledby="action-heading">
+                <div class="card action-card">
+                    <div class="card-body text-center">
+                        <div class="action-content">
+                            <div class="action-icon">
+                                <span class="material-icons" aria-hidden="true">mic</span>
+                            </div>
+                            <h2 id="action-heading" class="action-title">Ready to Transcribe?</h2>
+                            <p class="action-subtitle">Upload your audio file and click below to start</p>
+                            <button 
+                                class="btn btn-primary btn-lg" 
+                                id="transcribeBtn" 
+                                onclick="startTranscription()" 
+                                disabled
+                                aria-label="Start audio transcription process"
+                                aria-describedby="transcribe-help"
+                            >
+                                <span class="material-icons" aria-hidden="true">play_arrow</span> Start Transcription
+                            </button>
+                            <div id="transcribe-help" class="sr-only">
+                                Click to begin transcribing your uploaded audio file
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Section -->
+            <section class="progress-section" id="progressSection" style="display: none;" aria-labelledby="progress-heading" role="region" aria-live="polite">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 id="progress-heading"><span class="material-icons" aria-hidden="true">auto_awesome</span> Transcription Progress</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary btn-sm" id="refreshStatusBtn" onclick="refreshStatus()" title="Refresh Status" aria-label="Refresh transcription status">
+                                <span class="material-icons" aria-hidden="true">refresh</span> Refresh
+                            </button>
+                            <button class="btn btn-danger btn-sm" id="cancelJobBtn" onclick="cancelTranscription()" title="Cancel Transcription" aria-label="Cancel current transcription">
+                                <span class="material-icons" aria-hidden="true">stop</span> Cancel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress-container">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-labelledby="progress-heading">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="progressPercent" aria-live="polite">0%</span>
+                                <span id="progressMessage" aria-live="polite">Preparing...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-details" id="progressDetails">
+                            <!-- Progress details will be populated here -->
+                        </div>
+                        
+                        <div class="status-info" id="statusInfo" role="status" aria-live="polite">
+                            <div class="status-item">
+                                <span class="material-icons" aria-hidden="true">schedule</span>
+                                <span><strong>Started:</strong> <span id="startTime">-</span></span>
+                            </div>
+                            <div class="status-item">
+                                <span class="material-icons" aria-hidden="true">tag</span>
+                                <span><strong>Job ID:</strong> <span id="jobId">-</span></span>
+                            </div>
+                            <div class="status-item">
+                                <span class="material-icons" aria-hidden="true">wifi</span>
+                                <span><strong>Connection:</strong> <span id="connectionStatus" class="status-connected">Connected</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Files Section -->
+            <section class="my-files-section" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><span class="material-icons">folder</span> My Files</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="refreshMyFiles()">
+                                <span class="material-icons">refresh</span> Refresh
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="cleanupMyFiles()">
+                                <span class="material-icons">delete</span> Cleanup All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="quota-info" id="quotaInfo">
+                            <div class="quota-item">
+                                <span class="quota-label">Files:</span>
+                                <span class="quota-value" id="quotaFiles">-</span>
+                            </div>
+                            <div class="quota-item">
+                                <span class="quota-label">Storage:</span>
+                                <span class="quota-value" id="quotaStorage">-</span>
+                            </div>
+                            <div class="quota-item">
+                                <span class="quota-label">24h Files:</span>
+                                <span class="quota-value" id="quota24hFiles">-</span>
+                            </div>
+                            <div class="quota-item">
+                                <span class="quota-label">24h Storage:</span>
+                                <span class="quota-value" id="quota24hStorage">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="files-list" id="filesList">
+                            <div class="loading-files">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Loading your files...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><span class="material-icons">check_circle</span> Transcription Complete</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="result-summary" id="resultSummary">
+                            <!-- Result summary will be populated here -->
+                        </div>
+                        
+                        <div class="result-actions">
+                            <button class="btn btn-primary" id="viewTranscriptBtn" onclick="viewTranscript()">
+                                <span class="material-icons">visibility</span> View Transcript
+                            </button>
+                            <button class="btn btn-primary" id="downloadBtn" onclick="downloadResult()">
+                                <span class="material-icons">download</span> Download Transcription
+                            </button>
+                            <button class="btn btn-secondary" onclick="startNewTranscription()">
+                                <span class="material-icons">add</span> New Transcription
+                            </button>
+                        </div>
+                        
+                        <!-- View Existing Transcripts -->
+                        <div class="existing-transcripts mt-3" id="existingTranscripts" style="display: none;">
+                            <h6><span class="material-icons">history</span> View Existing Transcripts</h6>
+                            <div id="existingTranscriptsList">
+                                <!-- Existing transcripts will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Transcript Viewer Modal -->
+        <div class="modal fade" id="transcriptModal" tabindex="-1" aria-labelledby="transcriptModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="transcriptModalLabel">
+                            <span class="material-icons">description</span> Transcript Viewer
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <strong>File:</strong> <span id="transcriptFilename">-</span>
+                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="downloadTranscript()">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                        <div class="transcript-content" style="max-height: 500px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap;" id="transcriptContent">
+                            Loading transcript...
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <p>&copy; 2025 EchoScribe. Built by <a href="https://github.com/tathya" rel="noopener" aria-label="Tathya's GitHub profile">Tathya</a>. Powered by <a href="https://openai.com/research/whisper" rel="noopener" aria-label="OpenAI Whisper AI research">OpenAI Whisper AI</a>.</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;" role="status" aria-live="polite" aria-label="Processing overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <!-- Material Design Components JavaScript -->
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <!-- Analytics Tracking -->
+    <script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Initialize Material Design Components
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize any Material Design components if needed
+            console.log('Material Design components initialized');
+        });
+    </script>
+</body>
+</html>

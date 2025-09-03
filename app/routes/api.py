@@ -575,3 +575,128 @@ def cleanup_my_files():
     except Exception as e:
         current_app.logger.error(f"Cleanup my files error: {e}")
         return jsonify({'success': False, 'error': 'Failed to cleanup files'}), 500
+
+# Analytics Endpoints
+
+@api_bp.route('/analytics/config')
+def get_analytics_config():
+    """Get analytics configuration for frontend"""
+    try:
+        from app.services.analytics_service import analytics_service
+        config = analytics_service.get_analytics_config()
+        return jsonify(config)
+    except Exception as e:
+        current_app.logger.error(f"Analytics config error: {e}")
+        return jsonify({'error': 'Failed to get analytics config'}), 500
+
+@api_bp.route('/analytics/track', methods=['POST'])
+def track_analytics_event():
+    """Track analytics event from frontend"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        from app.services.analytics_service import analytics_service
+        
+        event_name = data.get('event_name')
+        if not event_name:
+            return jsonify({'error': 'Event name required'}), 400
+        
+        # Track different event types
+        if event_name == 'file_upload':
+            analytics_service.track_file_upload(
+                data.get('file_name', ''),
+                data.get('file_size', 0),
+                data.get('file_type', '')
+            )
+        elif event_name == 'transcription_start':
+            analytics_service.track_transcription_start(
+                data.get('model', ''),
+                data.get('language', ''),
+                data.get('speaker_diarization', False),
+                data.get('temperature', 0.2),
+                data.get('file_size', 0)
+            )
+        elif event_name == 'transcription_complete':
+            analytics_service.track_transcription_complete(
+                data.get('job_id', ''),
+                data.get('model', ''),
+                data.get('language', ''),
+                data.get('processing_time', 0),
+                data.get('file_size', 0),
+                data.get('transcript_length', 0),
+                data.get('success', True)
+            )
+        elif event_name == 'transcription_error':
+            analytics_service.track_transcription_error(
+                data.get('job_id', ''),
+                data.get('error_type', ''),
+                data.get('error_message', ''),
+                data.get('model', ''),
+                data.get('file_size', 0)
+            )
+        elif event_name == 'file_download':
+            analytics_service.track_download(
+                data.get('file_name', ''),
+                data.get('file_type', ''),
+                data.get('file_size', 0)
+            )
+        elif event_name == 'user_interaction':
+            analytics_service.track_user_interaction(
+                data.get('interaction_type', ''),
+                data.get('element_id'),
+                data.get('element_class'),
+                data.get('additional_data')
+            )
+        elif event_name == 'performance_metric':
+            analytics_service.track_performance_metric(
+                data.get('metric_name', ''),
+                data.get('metric_value', 0),
+                data.get('unit'),
+                data.get('context')
+            )
+        else:
+            # Generic event tracking
+            analytics_service.track_user_interaction(
+                event_name,
+                data.get('element_id'),
+                data.get('element_class'),
+                data
+            )
+        
+        return jsonify({'success': True, 'message': 'Event tracked'})
+        
+    except Exception as e:
+        current_app.logger.error(f"Analytics tracking error: {e}")
+        return jsonify({'error': 'Failed to track event'}), 500
+
+@api_bp.route('/analytics/summary')
+def get_analytics_summary():
+    """Get analytics summary for current session"""
+    try:
+        from app.services.analytics_service import analytics_service
+        summary = analytics_service.get_analytics_summary()
+        return jsonify(summary)
+    except Exception as e:
+        current_app.logger.error(f"Analytics summary error: {e}")
+        return jsonify({'error': 'Failed to get analytics summary'}), 500
+
+@api_bp.route('/analytics/user-properties', methods=['POST'])
+def set_user_properties():
+    """Set user properties for analytics"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        from app.services.analytics_service import analytics_service
+        
+        for property_name, property_value in data.items():
+            analytics_service.set_user_property(property_name, property_value)
+        
+        return jsonify({'success': True, 'message': 'User properties set'})
+        
+    except Exception as e:
+        current_app.logger.error(f"Set user properties error: {e}")
+        return jsonify({'error': 'Failed to set user properties'}), 500

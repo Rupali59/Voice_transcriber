@@ -51,6 +51,14 @@ class Config:
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_FILE = os.environ.get('LOG_FILE', 'logs/web_app.log')
     
+    # Analytics Configuration
+    GOOGLE_ANALYTICS_ID = os.environ.get('GOOGLE_ANALYTICS_ID')
+    HOTJAR_SITE_ID = os.environ.get('HOTJAR_SITE_ID')
+    ENABLE_ANALYTICS = os.environ.get('ENABLE_ANALYTICS', 'true').lower() == 'true'
+    ENABLE_GOOGLE_ANALYTICS = os.environ.get('ENABLE_GOOGLE_ANALYTICS', 'true').lower() == 'true'
+    ENABLE_HOTJAR = os.environ.get('ENABLE_HOTJAR', 'true').lower() == 'true'
+    ANALYTICS_DEBUG = os.environ.get('ANALYTICS_DEBUG', 'false').lower() == 'true'
+    
     # Server Configuration
     HOST = os.environ.get('HOST', '0.0.0.0')
     PORT = int(os.environ.get('PORT', 5001))
