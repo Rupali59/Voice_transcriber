@@ -22,6 +22,7 @@ socketio = SocketIO()
 transcription_service = None
 file_service = None
 ip_file_service = None
+storage_manager = None
 job_manager = None
 request_tracker = None
 
@@ -61,11 +62,12 @@ def create_app(config_class=Config):
 
 def _initialize_services(app):
     """Initialize global service instances"""
-    global transcription_service, file_service, ip_file_service, job_manager, request_tracker
+    global transcription_service, file_service, ip_file_service, storage_manager, job_manager, request_tracker
     
     from app.services.transcription_service import TranscriptionService
     from app.services.file_service import FileService
     from app.services.ip_file_service import IPFileService
+    from app.services.storage_manager import StorageManager, CleanupPolicy
     from app.services.job_manager import JobManager
     from app.services.request_tracker import RequestTracker
     
@@ -84,6 +86,22 @@ def _initialize_services(app):
     ip_file_service = IPFileService(
         base_upload_folder=app.config['UPLOAD_FOLDER'],
         allowed_extensions=app.config['ALLOWED_EXTENSIONS']
+    )
+    
+    # Initialize storage manager with cleanup policies
+    cleanup_policy = CleanupPolicy(
+        max_age_hours=app.config.get('IP_FILE_RETENTION_HOURS', 72),
+        max_total_size_mb=app.config.get('MAX_TOTAL_STORAGE_MB', 10000),  # 10GB
+        max_disk_usage_percent=app.config.get('MAX_DISK_USAGE_PERCENT', 80.0),
+        cleanup_interval_hours=app.config.get('STORAGE_CLEANUP_INTERVAL_HOURS', 6),
+        emergency_cleanup_threshold=app.config.get('EMERGENCY_CLEANUP_THRESHOLD', 90.0),
+        priority_cleanup_age_hours=app.config.get('PRIORITY_CLEANUP_AGE_HOURS', 24)
+    )
+    
+    global storage_manager
+    storage_manager = StorageManager(
+        base_path=app.config['UPLOAD_FOLDER'],
+        policy=cleanup_policy
     )
     
     request_tracker = RequestTracker()
@@ -112,6 +130,10 @@ def get_request_tracker():
 def get_ip_file_service():
     """Get the global IP file service instance"""
     return ip_file_service
+
+def get_storage_manager():
+    """Get the global storage manager instance"""
+    return storage_manager
 
 def create_socketio_app(app):
     """Create SocketIO app instance"""

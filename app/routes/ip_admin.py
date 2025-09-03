@@ -160,3 +160,162 @@ def cleanup_all_old_files():
     except Exception as e:
         current_app.logger.error(f"Cleanup all files error: {e}")
         return jsonify({'success': False, 'error': 'Failed to cleanup files'}), 500
+
+# Storage Management Endpoints
+
+@ip_admin_bp.route('/storage/stats')
+def get_storage_stats():
+    """Get comprehensive storage statistics"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        stats = storage_manager.get_storage_stats()
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'total_size_mb': round(stats.total_size_mb, 2),
+                'total_files': stats.total_files,
+                'disk_usage_percent': round(stats.disk_usage_percent, 2),
+                'available_space_mb': round(stats.available_space_mb, 2),
+                'oldest_file_age_hours': round(stats.oldest_file_age_hours, 2),
+                'newest_file_age_hours': round(stats.newest_file_age_hours, 2),
+                'average_file_size_mb': round(stats.average_file_size_mb, 2)
+            }
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get storage stats error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get storage stats'}), 500
+
+@ip_admin_bp.route('/storage/health')
+def get_storage_health():
+    """Get storage health information"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        health = storage_manager.get_storage_health()
+        
+        return jsonify({
+            'success': True,
+            'health': health
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get storage health error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get storage health'}), 500
+
+@ip_admin_bp.route('/storage/cleanup', methods=['POST'])
+def trigger_storage_cleanup():
+    """Manually trigger storage cleanup"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        
+        cleanup_results = storage_manager.smart_cleanup()
+        
+        total_deleted = sum(result['deleted_files'] for result in cleanup_results.values())
+        total_freed = sum(result['freed_space_mb'] for result in cleanup_results.values())
+        
+        return jsonify({
+            'success': True,
+            'message': f'Storage cleanup completed. Deleted {total_deleted} files, freed {total_freed:.2f} MB',
+            'results': cleanup_results,
+            'summary': {
+                'total_deleted_files': total_deleted,
+                'total_freed_mb': round(total_freed, 2)
+            }
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Storage cleanup error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to cleanup storage'}), 500
+
+@ip_admin_bp.route('/storage/cleanup/age', methods=['POST'])
+def cleanup_by_age():
+    """Clean up files by age"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        
+        data = request.get_json() or {}
+        max_age_hours = data.get('max_age_hours')
+        
+        deleted_files, freed_space = storage_manager.cleanup_by_age(max_age_hours)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Age cleanup completed. Deleted {deleted_files} files, freed {freed_space:.2f} MB',
+            'deleted_files': deleted_files,
+            'freed_space_mb': round(freed_space, 2)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Age cleanup error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to cleanup by age'}), 500
+
+@ip_admin_bp.route('/storage/cleanup/size', methods=['POST'])
+def cleanup_by_size():
+    """Clean up files by size"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        
+        data = request.get_json() or {}
+        target_size_mb = data.get('target_size_mb')
+        
+        if not target_size_mb:
+            return jsonify({'error': 'target_size_mb is required'}), 400
+        
+        deleted_files, freed_space = storage_manager.cleanup_by_size(target_size_mb)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Size cleanup completed. Deleted {deleted_files} files, freed {freed_space:.2f} MB',
+            'deleted_files': deleted_files,
+            'freed_space_mb': round(freed_space, 2)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Size cleanup error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to cleanup by size'}), 500
+
+@ip_admin_bp.route('/storage/cleanup/emergency', methods=['POST'])
+def emergency_cleanup():
+    """Trigger emergency cleanup"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        
+        deleted_files, freed_space = storage_manager.emergency_cleanup()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Emergency cleanup completed. Deleted {deleted_files} files, freed {freed_space:.2f} MB',
+            'deleted_files': deleted_files,
+            'freed_space_mb': round(freed_space, 2)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Emergency cleanup error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to perform emergency cleanup'}), 500
+
+@ip_admin_bp.route('/storage/logs')
+def get_cleanup_logs():
+    """Get recent cleanup logs"""
+    try:
+        from app import get_storage_manager
+        storage_manager = get_storage_manager()
+        
+        limit = request.args.get('limit', 50, type=int)
+        logs = storage_manager.get_cleanup_log(limit)
+        
+        return jsonify({
+            'success': True,
+            'logs': logs,
+            'count': len(logs)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get cleanup logs error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get cleanup logs'}), 500

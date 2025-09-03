@@ -40,6 +40,13 @@ class Config:
     IP_CLEANUP_INTERVAL_HOURS = int(os.environ.get('IP_CLEANUP_INTERVAL_HOURS', 24))
     IP_FILE_RETENTION_HOURS = int(os.environ.get('IP_FILE_RETENTION_HOURS', 72))  # 3 days
     
+    # Advanced Storage Management Configuration
+    MAX_TOTAL_STORAGE_MB = float(os.environ.get('MAX_TOTAL_STORAGE_MB', 10000))  # 10GB
+    MAX_DISK_USAGE_PERCENT = float(os.environ.get('MAX_DISK_USAGE_PERCENT', 80.0))  # 80%
+    STORAGE_CLEANUP_INTERVAL_HOURS = int(os.environ.get('STORAGE_CLEANUP_INTERVAL_HOURS', 6))  # 6 hours
+    EMERGENCY_CLEANUP_THRESHOLD = float(os.environ.get('EMERGENCY_CLEANUP_THRESHOLD', 90.0))  # 90%
+    PRIORITY_CLEANUP_AGE_HOURS = int(os.environ.get('PRIORITY_CLEANUP_AGE_HOURS', 24))  # 24 hours
+    
     # Logging Configuration
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_FILE = os.environ.get('LOG_FILE', 'logs/web_app.log')
