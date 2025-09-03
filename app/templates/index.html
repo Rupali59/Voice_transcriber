@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Transcriber - AI-Powered Audio Transcription</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>EchoScribe - AI-Powered Audio Transcription</title>
+    <!-- Material Design Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Material Design Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Material Design Components CSS -->
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <!-- Custom Material Design Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/material-style.css') }}">
 </head>
 <body>
 
@@ -16,8 +21,8 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-microphone-alt"></i>
-                    <h1>Voice Transcriber</h1>
+                    <span class="material-icons">mic</span>
+                    <h1>EchoScribe</h1>
                 </div>
                 <p class="subtitle">AI-Powered Audio Transcription with Real-time Progress</p>
             </div>
@@ -29,13 +34,13 @@
             <section class="upload-section">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-upload"></i> Upload Audio & Configure Transcription</h2>
+                        <h2><span class="material-icons">upload</span> Upload Audio & Configure Transcription</h2>
                     </div>
                     <div class="card-body">
                         <!-- Upload Area -->
                         <div class="upload-area" id="uploadArea">
                             <div class="upload-content">
-                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <span class="material-icons upload-icon">cloud_upload</span>
                                 <h3>Drop your audio file here</h3>
                                 <p>or <span class="upload-link" onclick="document.getElementById('fileInput').click()">browse files</span></p>
                                 <p class="file-types">Supported: WAV, MP3, M4A, FLAC, OGG, WMA, AAC, MP4</p>
@@ -47,13 +52,13 @@
                         <!-- File Info -->
                         <div class="file-info" id="fileInfo" style="display: none;">
                             <div class="file-details">
-                                <i class="fas fa-file-audio"></i>
+                                <span class="material-icons">audiotrack</span>
                                 <div class="file-text">
                                     <h4 id="fileName"></h4>
                                     <p id="fileSize"></p>
                                 </div>
                                 <button class="btn btn-danger btn-sm" onclick="clearFile()">
-                                    <i class="fas fa-times"></i>
+                                    <span class="material-icons">close</span>
                                 </button>
                             </div>
                         </div>
@@ -63,7 +68,7 @@
                             <div class="options-row">
                                 <div class="option-group">
                                     <label for="modelSelect">
-                                        <i class="fas fa-brain"></i> AI Model
+                                        <span class="material-icons">psychology</span> AI Model
                                     </label>
                                     <select id="modelSelect" class="form-select" title="Speed: ⚡⚡⚡⚡⚡ | Processing: ⭐⭐">
                                         <option value="tiny" title="Speed: ⚡⚡⚡⚡⚡ | Processing: ⭐⭐">Tiny - Fastest</option>
@@ -76,7 +81,7 @@
 
                                 <div class="option-group">
                                     <label for="languageSelect">
-                                        <i class="fas fa-globe"></i> Language
+                                        <span class="material-icons">language</span> Language
                                     </label>
                                     <select id="languageSelect" class="form-select" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">
                                         <option value="auto" selected title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">Auto-detect</option>
@@ -97,14 +102,13 @@
                                 <div class="option-group checkbox-group">
                                     <label class="checkbox-label" title="Speed: ⚡⚡ | Processing: ⭐⭐⭐⭐">
                                         <input type="checkbox" id="speakerDiarization" checked>
-                                        <span class="checkmark"></span>
-                                        <i class="fas fa-users"></i> Speaker Diarization
+                                        <span class="material-icons">group</span> Speaker Diarization
                                     </label>
                                 </div>
 
                                 <div class="option-group">
                                     <label for="temperatureSelect">
-                                        <i class="fas fa-thermometer-half"></i> Temperature
+                                        <span class="material-icons">thermostat</span> Temperature
                                     </label>
                                     <select id="temperatureSelect" class="form-select" title="Speed: ⚡⚡⚡ | Processing: ⭐⭐⭐⭐">
                                         <option value="0.0" title="Speed: ⚡⚡⚡⚡ | Processing: ⭐⭐⭐⭐⭐">0.0 - Most consistent</option>
@@ -126,7 +130,7 @@
                     <div class="card-body text-center">
                         <div class="action-content">
                             <div class="action-icon">
-                                <i class="fas fa-microphone-alt"></i>
+                                <span class="material-icons">mic</span>
                             </div>
                             <h3 class="action-title">Ready to Transcribe?</h3>
                             <p class="action-subtitle">Upload your audio file and click below to start</p>
@@ -138,7 +142,7 @@
                                 aria-label="Start audio transcription process"
                                 aria-describedby="transcribe-help"
                             >
-                                <i class="fas fa-play" aria-hidden="true"></i> Start Transcription
+                                <span class="material-icons" aria-hidden="true">play_arrow</span> Start Transcription
                             </button>
                             <div id="transcribe-help" class="sr-only">
                                 Click to begin transcribing your uploaded audio file
@@ -153,13 +157,13 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="header-content">
-                            <h2><i class="fas fa-tasks"></i> Transcription Progress</h2>
+                            <h2><span class="material-icons">trending_up</span> Transcription Progress</h2>
                             <div class="header-actions">
-                                <button class="btn btn-outline-primary btn-sm" id="refreshStatusBtn" onclick="refreshStatus()" title="Refresh Status">
-                                    <i class="fas fa-sync-alt"></i> Refresh
+                                <button class="btn btn-secondary btn-sm" id="refreshStatusBtn" onclick="refreshStatus()" title="Refresh Status">
+                                    <span class="material-icons">refresh</span> Refresh
                                 </button>
-                                <button class="btn btn-outline-secondary btn-sm" id="cancelJobBtn" onclick="cancelTranscription()" title="Cancel Transcription">
-                                    <i class="fas fa-times"></i> Cancel
+                                <button class="btn btn-danger btn-sm" id="cancelJobBtn" onclick="cancelTranscription()" title="Cancel Transcription">
+                                    <span class="material-icons">close</span> Cancel
                                 </button>
                             </div>
                         </div>
@@ -201,13 +205,13 @@
             <section class="my-files-section" style="display: none;">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-folder"></i> My Files</h2>
+                        <h2><span class="material-icons">folder</span> My Files</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="refreshMyFiles()">
-                                <i class="fas fa-sync-alt"></i> Refresh
+                            <button class="btn btn-sm btn-secondary" onclick="refreshMyFiles()">
+                                <span class="material-icons">refresh</span> Refresh
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="cleanupMyFiles()">
-                                <i class="fas fa-trash"></i> Cleanup All
+                            <button class="btn btn-sm btn-danger" onclick="cleanupMyFiles()">
+                                <span class="material-icons">delete</span> Cleanup All
                             </button>
                         </div>
                     </div>
@@ -245,7 +249,7 @@
             <section class="results-section" id="resultsSection" style="display: none;">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-check-circle"></i> Transcription Complete</h2>
+                        <h2><span class="material-icons">check_circle</span> Transcription Complete</h2>
                     </div>
                     <div class="card-body">
                         <div class="result-summary" id="resultSummary">
@@ -253,20 +257,20 @@
                         </div>
                         
                         <div class="result-actions">
-                            <button class="btn btn-info" id="viewTranscriptBtn" onclick="viewTranscript()">
-                                <i class="fas fa-eye"></i> View Transcript
+                            <button class="btn btn-primary" id="viewTranscriptBtn" onclick="viewTranscript()">
+                                <span class="material-icons">visibility</span> View Transcript
                             </button>
-                            <button class="btn btn-success" id="downloadBtn" onclick="downloadResult()">
-                                <i class="fas fa-download"></i> Download Transcription
+                            <button class="btn btn-primary" id="downloadBtn" onclick="downloadResult()">
+                                <span class="material-icons">download</span> Download Transcription
                             </button>
                             <button class="btn btn-secondary" onclick="startNewTranscription()">
-                                <i class="fas fa-plus"></i> New Transcription
+                                <span class="material-icons">add</span> New Transcription
                             </button>
                         </div>
                         
                         <!-- View Existing Transcripts -->
                         <div class="existing-transcripts mt-3" id="existingTranscripts" style="display: none;">
-                            <h6><i class="fas fa-history"></i> View Existing Transcripts</h6>
+                            <h6><span class="material-icons">history</span> View Existing Transcripts</h6>
                             <div id="existingTranscriptsList">
                                 <!-- Existing transcripts will be populated here -->
                             </div>
@@ -282,7 +286,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="transcriptModalLabel">
-                            <i class="fas fa-file-alt"></i> Transcript Viewer
+                            <span class="material-icons">description</span> Transcript Viewer
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -306,7 +310,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>&copy; 2025 Voice Transcriber. Built by Tathya. Powered by OpenAI Whisper AI.</p>
+            <p>&copy; 2025 EchoScribe. Built by Tathya. Powered by OpenAI Whisper AI.</p>
         </footer>
     </div>
 
@@ -320,6 +324,15 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <!-- Material Design Components JavaScript -->
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Initialize Material Design Components
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize any Material Design components if needed
+            console.log('Material Design components initialized');
+        });
+    </script>
 </body>
 </html>

@@ -495,7 +495,7 @@ class VoiceTranscriberApp {
                 <div class="file-item">
                     <div class="file-info">
                         <div class="file-icon ${fileIcon.type}">
-                            <i class="${fileIcon.icon}"></i>
+                            <span class="material-icons">${fileIcon.icon}</span>
                         </div>
                         <div class="file-details">
                             <h6>${file.original_name}</h6>
@@ -503,11 +503,11 @@ class VoiceTranscriberApp {
                         </div>
                     </div>
                     <div class="file-actions">
-                        <button class="btn btn-sm btn-outline-info" onclick="app.downloadFile('${file.filename}')">
-                            <i class="fas fa-download"></i>
+                        <button class="btn btn-sm btn-primary" onclick="app.downloadFile('${file.filename}')">
+                            <span class="material-icons">download</span>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="app.deleteFile('${file.filename}')">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-sm btn-danger" onclick="app.deleteFile('${file.filename}')">
+                            <span class="material-icons">delete</span>
                         </button>
                     </div>
                 </div>
@@ -567,11 +567,11 @@ class VoiceTranscriberApp {
         const videoExts = ['mp4', 'avi', 'mov', 'mkv', 'webm'];
         
         if (audioExts.includes(ext)) {
-            return { type: 'audio', icon: 'fas fa-music' };
+            return { type: 'audio', icon: 'audiotrack' };
         } else if (videoExts.includes(ext)) {
-            return { type: 'video', icon: 'fas fa-video' };
+            return { type: 'video', icon: 'video_file' };
         } else {
-            return { type: 'other', icon: 'fas fa-file' };
+            return { type: 'other', icon: 'description' };
         }
     }
 
@@ -670,7 +670,7 @@ class VoiceTranscriberApp {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>
             <span>${message}</span>
         `;
         
@@ -693,7 +693,7 @@ class VoiceTranscriberApp {
             element.classList.add('error-state');
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
-            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            errorDiv.innerHTML = `<span class="material-icons">warning</span> ${message}`;
             
             // Insert after the element
             element.parentNode.insertBefore(errorDiv, element.nextSibling);
@@ -715,7 +715,7 @@ class VoiceTranscriberApp {
             element.classList.add('success-state');
             const successDiv = document.createElement('div');
             successDiv.className = 'success-message';
-            successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            successDiv.innerHTML = `<span class="material-icons">check_circle</span> ${message}`;
             
             // Insert after the element
             element.parentNode.insertBefore(successDiv, element.nextSibling);
