@@ -30,6 +30,16 @@ class Config:
     ENABLE_GPU_ACCELERATION = os.environ.get('ENABLE_GPU_ACCELERATION', 'true').lower() == 'true'
     PRELOAD_MODELS = os.environ.get('PRELOAD_MODELS', 'base,small').split(',')
     
+    # IP-based DoS Protection Configuration
+    MAX_FILES_PER_IP = int(os.environ.get('MAX_FILES_PER_IP', 50))
+    MAX_SIZE_MB_PER_IP = float(os.environ.get('MAX_SIZE_MB_PER_IP', 1000))  # 1GB
+    MAX_FILES_24H_PER_IP = int(os.environ.get('MAX_FILES_24H_PER_IP', 20))
+    MAX_SIZE_24H_MB_PER_IP = float(os.environ.get('MAX_SIZE_24H_MB_PER_IP', 500))  # 500MB
+    RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get('RATE_LIMIT_WINDOW_SECONDS', 3600))  # 1 hour
+    MAX_REQUESTS_PER_WINDOW = int(os.environ.get('MAX_REQUESTS_PER_WINDOW', 100))
+    IP_CLEANUP_INTERVAL_HOURS = int(os.environ.get('IP_CLEANUP_INTERVAL_HOURS', 24))
+    IP_FILE_RETENTION_HOURS = int(os.environ.get('IP_FILE_RETENTION_HOURS', 72))  # 3 days
+    
     # Logging Configuration
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_FILE = os.environ.get('LOG_FILE', 'logs/web_app.log')

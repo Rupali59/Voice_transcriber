@@ -14,7 +14,7 @@ api_bp = Blueprint('api', __name__)
 
 @api_bp.route('/upload', methods=['POST'])
 def upload_file():
-    """Handle file upload"""
+    """Handle file upload with IP-based tracking and DoS protection"""
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -23,22 +23,37 @@ def upload_file():
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
         
-        # Get file service from global instance
-        from app import get_file_service
-        file_service = get_file_service()
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
         
-        # Save uploaded file
-        file_upload = file_service.save_uploaded_file(
+        # Get IP file service from global instance
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        # Save uploaded file with IP tracking and DoS protection
+        file_upload = ip_file_service.save_uploaded_file(
             file, 
-            current_app.config['MAX_CONTENT_LENGTH']
+            current_app.config['MAX_CONTENT_LENGTH'],
+            client_ip
         )
+        
+        # Get quota info for response
+        quota = ip_file_service.get_ip_quota(client_ip)
         
         return jsonify({
             'success': True,
             'filename': file_upload.filename,
             'original_name': file_upload.original_name,
             'size_mb': round(file_upload.size_mb, 2),
-            'filepath': file_upload.filepath
+            'filepath': file_upload.filepath,
+            'quota_info': {
+                'total_files': quota.total_files if quota else 0,
+                'total_size_mb': round(quota.total_size_mb, 2) if quota else 0.0,
+                'files_24h': quota.file_count_24h if quota else 0,
+                'size_24h_mb': round(quota.size_mb_24h, 2) if quota else 0.0
+            }
         })
         
     except ValueError as e:
@@ -435,3 +450,128 @@ def cleanup_old_requests():
     except Exception as e:
         current_app.logger.error(f"Cleanup requests error: {e}")
         return jsonify({'success': False, 'error': 'Failed to cleanup requests'}), 500
+
+# IP-based file management endpoints
+
+@api_bp.route('/my-files')
+def get_my_files():
+    """Get files uploaded by the current IP address"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        files = ip_file_service.get_files_by_ip(client_ip)
+        
+        return jsonify({
+            'success': True,
+            'ip_address': client_ip,
+            'files': [asdict(f) for f in files],
+            'file_count': len(files),
+            'total_size_mb': round(sum(f.size_mb for f in files), 2)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get my files error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get files'}), 500
+
+@api_bp.route('/my-files/<filename>')
+def get_my_file(filename):
+    """Get a specific file uploaded by the current IP address"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        file_record = ip_file_service.get_file_by_ip_and_name(client_ip, filename)
+        if not file_record:
+            return jsonify({'error': 'File not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'file': asdict(file_record)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get my file error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get file'}), 500
+
+@api_bp.route('/my-files/<filename>', methods=['DELETE'])
+def delete_my_file(filename):
+    """Delete a file uploaded by the current IP address"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        success = ip_file_service.delete_file_by_ip(client_ip, filename)
+        if not success:
+            return jsonify({'error': 'File not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'message': 'File deleted successfully'
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Delete my file error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to delete file'}), 500
+
+@api_bp.route('/my-quota')
+def get_my_quota():
+    """Get quota information for the current IP address"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        stats = ip_file_service.get_ip_stats(client_ip)
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get my quota error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get quota'}), 500
+
+@api_bp.route('/my-files/cleanup', methods=['POST'])
+def cleanup_my_files():
+    """Clean up all files for the current IP address"""
+    try:
+        # Get client IP address
+        client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+        if ',' in client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        
+        from app import get_ip_file_service
+        ip_file_service = get_ip_file_service()
+        
+        deleted_count = ip_file_service.cleanup_ip_files(client_ip)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Cleaned up {deleted_count} files',
+            'deleted_count': deleted_count
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Cleanup my files error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to cleanup files'}), 500

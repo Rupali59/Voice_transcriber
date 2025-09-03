@@ -12,6 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from app.config import Config
 from app.routes import main_bp, api_bp
 from app.routes.admin import admin_bp
+from app.routes.ip_admin import ip_admin_bp
 from app.utils.logger import setup_logging
 
 # Global instances
@@ -20,6 +21,7 @@ socketio = SocketIO()
 # Global service instances (singletons)
 transcription_service = None
 file_service = None
+ip_file_service = None
 job_manager = None
 request_tracker = None
 
@@ -41,6 +43,7 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(admin_bp)
+    app.register_blueprint(ip_admin_bp)
     
     # Create necessary directories
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -58,10 +61,11 @@ def create_app(config_class=Config):
 
 def _initialize_services(app):
     """Initialize global service instances"""
-    global transcription_service, file_service, job_manager, request_tracker
+    global transcription_service, file_service, ip_file_service, job_manager, request_tracker
     
     from app.services.transcription_service import TranscriptionService
     from app.services.file_service import FileService
+    from app.services.ip_file_service import IPFileService
     from app.services.job_manager import JobManager
     from app.services.request_tracker import RequestTracker
     
@@ -73,6 +77,12 @@ def _initialize_services(app):
     
     file_service = FileService(
         upload_folder=app.config['UPLOAD_FOLDER'],
+        allowed_extensions=app.config['ALLOWED_EXTENSIONS']
+    )
+    
+    # Initialize IP-based file service with DoS protection
+    ip_file_service = IPFileService(
+        base_upload_folder=app.config['UPLOAD_FOLDER'],
         allowed_extensions=app.config['ALLOWED_EXTENSIONS']
     )
     
@@ -98,6 +108,10 @@ def get_job_manager():
 def get_request_tracker():
     """Get the global request tracker instance"""
     return request_tracker
+
+def get_ip_file_service():
+    """Get the global IP file service instance"""
+    return ip_file_service
 
 def create_socketio_app(app):
     """Create SocketIO app instance"""

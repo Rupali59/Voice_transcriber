@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Management Dashboard - Voice Transcriber</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 2px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .blocked-ip {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ IP Management Dashboard</h1>
+        
+        <div id="loading" class="loading">Loading statistics...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="success" class="success" style="display: none;"></div>
+        
+        <div id="dashboard" style="display: none;">
+            <!-- Overall Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-ips">-</div>
+                    <div class="stat-label">Total IPs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-files">-</div>
+                    <div class="stat-label">Total Files</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-size">-</div>
+                    <div class="stat-label">Total Size (MB)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="blocked-ips">-</div>
+                    <div class="stat-label">Blocked IPs</div>
+                </div>
+            </div>
+            
+            <!-- Top IPs by Files -->
+            <div class="section">
+                <h2>📊 Top IPs by File Count</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>File Count</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-ips-files">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Top IPs by Size -->
+            <div class="section">
+                <h2>💾 Top IPs by Storage Size</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Size (MB)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-ips-size">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Blocked IPs -->
+            <div class="section">
+                <h2>🚫 Blocked IPs</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blocked-ips-list">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Actions -->
+            <div class="section">
+                <h2>🔧 Actions</h2>
+                <button class="btn btn-info" onclick="refreshStats()">Refresh Statistics</button>
+                <button class="btn btn-warning" onclick="cleanupAllFiles()">Cleanup All Old Files</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStats = null;
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/admin/ip/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentStats = data.stats;
+                    displayStats(data.stats);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                } else {
+                    showError('Failed to load statistics: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error loading statistics: ' + error.message);
+            }
+        }
+        
+        function displayStats(stats) {
+            // Update stat cards
+            document.getElementById('total-ips').textContent = stats.total_ips;
+            document.getElementById('total-files').textContent = stats.total_files;
+            document.getElementById('total-size').textContent = stats.total_size_mb.toFixed(2);
+            document.getElementById('blocked-ips').textContent = stats.blocked_ips;
+            
+            // Update top IPs by files
+            const topFilesTable = document.getElementById('top-ips-files');
+            topFilesTable.innerHTML = '';
+            stats.top_ips_by_files.forEach(([ip, count]) => {
+                const row = topFilesTable.insertRow();
+                row.innerHTML = `
+                    <td>${ip}</td>
+                    <td>${count}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="viewIPDetails('${ip}')">View Details</button>
+                        <button class="btn btn-warning" onclick="cleanupIPFiles('${ip}')">Cleanup</button>
+                        <button class="btn btn-danger" onclick="blockIP('${ip}')">Block</button>
+                    </td>
+                `;
+            });
+            
+            // Update top IPs by size
+            const topSizeTable = document.getElementById('top-ips-size');
+            topSizeTable.innerHTML = '';
+            stats.top_ips_by_size.forEach(([ip, size]) => {
+                const row = topSizeTable.insertRow();
+                row.innerHTML = `
+                    <td>${ip}</td>
+                    <td>${size.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="viewIPDetails('${ip}')">View Details</button>
+                        <button class="btn btn-warning" onclick="cleanupIPFiles('${ip}')">Cleanup</button>
+                        <button class="btn btn-danger" onclick="blockIP('${ip}')">Block</button>
+                    </td>
+                `;
+            });
+            
+            // Update blocked IPs
+            const blockedTable = document.getElementById('blocked-ips-list');
+            blockedTable.innerHTML = '';
+            stats.blocked_ips_list.forEach(ip => {
+                const row = blockedTable.insertRow();
+                row.className = 'blocked-ip';
+                row.innerHTML = `
+                    <td>${ip}</td>
+                    <td>
+                        <button class="btn btn-success" onclick="unblockIP('${ip}')">Unblock</button>
+                        <button class="btn btn-info" onclick="viewIPDetails('${ip}')">View Details</button>
+                    </td>
+                `;
+            });
+        }
+        
+        async function viewIPDetails(ip) {
+            try {
+                const response = await fetch(`/admin/ip/ip/${ip}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const details = data.ip_details;
+                    alert(`IP Details for ${ip}:\n\n` +
+                          `Files: ${details.file_count}\n` +
+                          `Total Size: ${details.total_size_mb.toFixed(2)} MB\n` +
+                          `24h Files: ${details.quota?.file_count_24h || 0}\n` +
+                          `24h Size: ${details.quota?.size_mb_24h?.toFixed(2) || 0} MB\n` +
+                          `Blocked: ${details.quota?.is_blocked ? 'Yes' : 'No'}`);
+                } else {
+                    showError('Failed to get IP details: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error getting IP details: ' + error.message);
+            }
+        }
+        
+        async function blockIP(ip) {
+            const reason = prompt('Enter reason for blocking:');
+            if (!reason) return;
+            
+            const hours = prompt('Enter hours to block (default 24):') || '24';
+            
+            try {
+                const response = await fetch(`/admin/ip/ip/${ip}/block`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reason: reason,
+                        hours: parseInt(hours)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadStats();
+                } else {
+                    showError('Failed to block IP: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error blocking IP: ' + error.message);
+            }
+        }
+        
+        async function unblockIP(ip) {
+            try {
+                const response = await fetch(`/admin/ip/ip/${ip}/unblock`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadStats();
+                } else {
+                    showError('Failed to unblock IP: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error unblocking IP: ' + error.message);
+            }
+        }
+        
+        async function cleanupIPFiles(ip) {
+            if (!confirm(`Are you sure you want to cleanup all files for IP ${ip}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/ip/ip/${ip}/cleanup`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadStats();
+                } else {
+                    showError('Failed to cleanup IP files: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error cleaning up IP files: ' + error.message);
+            }
+        }
+        
+        async function cleanupAllFiles() {
+            if (!confirm('Are you sure you want to cleanup all old files?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/ip/cleanup-all', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadStats();
+                } else {
+                    showError('Failed to cleanup files: ' + data.error);
+                }
+            } catch (error) {
+                showError('Error cleaning up files: ' + error.message);
+            }
+        }
+        
+        function refreshStats() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            loadStats();
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Load stats on page load
+        loadStats();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>
