@@ -173,23 +173,23 @@ body::after {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
 }
 
 /* Header */
 .header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     color: white;
 }
 
 .header-content {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(15px);
-    border-radius: 25px;
-    padding: 40px;
+    border-radius: 20px;
+    padding: 25px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.1),
@@ -288,13 +288,13 @@ body::after {
 }
 
 .logo h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     margin: 0;
 }
 
 .subtitle {
-    font-size: 1.1rem;
+    font-size: 1rem;
     opacity: 0.9;
     font-weight: 300;
 }
@@ -303,11 +303,11 @@ body::after {
 .card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    border-radius: 20px;
+    border-radius: 15px;
     box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.1),
+        0 8px 25px rgba(0, 0, 0, 0.1),
         0 1px 0 rgba(255, 255, 255, 0.2) inset;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -354,14 +354,14 @@ body::after {
 }
 
 .card-body {
-    padding: 30px;
+    padding: 20px;
 }
 
 /* Upload Area */
 .upload-area {
     border: 3px dashed #ddd;
-    border-radius: 20px;
-    padding: 60px 20px;
+    border-radius: 15px;
+    padding: 40px 20px;
     text-align: center;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
@@ -415,14 +415,14 @@ body::after {
 }
 
 .upload-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: #667eea;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .upload-content h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
     color: #333;
 }
 
@@ -974,9 +974,9 @@ body::after {
 /* Footer */
 .footer {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 25px;
     color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 /* Loading Overlay */
@@ -1111,10 +1111,10 @@ body::after {
 
 .quota-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 12px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     backdrop-filter: blur(10px);
@@ -1145,7 +1145,7 @@ body::after {
 }
 
 .files-list {
-    min-height: 100px;
+    min-height: 60px;
 }
 
 .loading-files {
@@ -1153,7 +1153,7 @@ body::after {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 40px;
+    padding: 25px;
     color: rgba(255, 255, 255, 0.7);
 }
 
@@ -1161,8 +1161,8 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1184,28 +1184,28 @@ body::after {
 }
 
 .file-icon {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(102, 126, 234, 0.3);
-    border-radius: 8px;
+    border-radius: 6px;
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .file-details h6 {
     margin: 0;
     color: #fff;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .file-details p {
     margin: 0;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .file-actions {
@@ -1214,20 +1214,20 @@ body::after {
 }
 
 .file-actions .btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
 }
 
 .no-files {
     text-align: center;
-    padding: 40px;
+    padding: 25px;
     color: rgba(255, 255, 255, 0.7);
 }
 
 .no-files i {
-    font-size: 3rem;
-    margin-bottom: 15px;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
     color: rgba(255, 255, 255, 0.5);
 }
 
