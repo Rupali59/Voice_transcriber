@@ -156,16 +156,14 @@
             <section class="progress-section" id="progressSection" style="display: none;">
                 <div class="card">
                     <div class="card-header">
-                        <div class="header-content">
-                            <h2><span class="material-icons">trending_up</span> Transcription Progress</h2>
-                            <div class="header-actions">
-                                <button class="btn btn-secondary btn-sm" id="refreshStatusBtn" onclick="refreshStatus()" title="Refresh Status">
-                                    <span class="material-icons">refresh</span> Refresh
-                                </button>
-                                <button class="btn btn-danger btn-sm" id="cancelJobBtn" onclick="cancelTranscription()" title="Cancel Transcription">
-                                    <span class="material-icons">close</span> Cancel
-                                </button>
-                            </div>
+                        <h2><span class="material-icons">auto_awesome</span> Transcription Progress</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary btn-sm" id="refreshStatusBtn" onclick="refreshStatus()" title="Refresh Status">
+                                <span class="material-icons">refresh</span> Refresh
+                            </button>
+                            <button class="btn btn-danger btn-sm" id="cancelJobBtn" onclick="cancelTranscription()" title="Cancel Transcription">
+                                <span class="material-icons">stop</span> Cancel
+                            </button>
                         </div>
                     </div>
                     <div class="card-body">
@@ -185,15 +183,15 @@
                         
                         <div class="status-info" id="statusInfo">
                             <div class="status-item">
-                                <i class="fas fa-clock"></i>
+                                <span class="material-icons">schedule</span>
                                 <span><strong>Started:</strong> <span id="startTime">-</span></span>
                             </div>
                             <div class="status-item">
-                                <i class="fas fa-hashtag"></i>
+                                <span class="material-icons">tag</span>
                                 <span><strong>Job ID:</strong> <span id="jobId">-</span></span>
                             </div>
                             <div class="status-item">
-                                <i class="fas fa-wifi"></i>
+                                <span class="material-icons">wifi</span>
                                 <span><strong>Connection:</strong> <span id="connectionStatus" class="status-connected">Connected</span></span>
                             </div>
                         </div>
