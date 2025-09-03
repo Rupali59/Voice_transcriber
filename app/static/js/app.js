@@ -16,6 +16,7 @@ class VoiceTranscriberApp {
         this.setupEventListeners();
         this.loadMyFiles();
         this.loadQuotaInfo();
+        this.checkExistingTranscripts();
     }
 
     setupSocketConnection() {
@@ -124,6 +125,11 @@ class VoiceTranscriberApp {
                 // Refresh file list and quota info
                 this.loadMyFiles();
                 this.loadQuotaInfo();
+                // Show My Files section since we now have a file
+                const myFilesSection = document.querySelector('.my-files-section');
+                if (myFilesSection) {
+                    myFilesSection.style.display = 'block';
+                }
             } else {
                 this.showError(result.error || 'Upload failed');
             }
@@ -455,15 +461,19 @@ class VoiceTranscriberApp {
 
     displayMyFiles(files) {
         const filesList = document.getElementById('filesList');
+        const myFilesSection = document.querySelector('.my-files-section');
         
         if (files.length === 0) {
-            filesList.innerHTML = `
-                <div class="no-files">
-                    <i class="fas fa-folder-open"></i>
-                    <p>No files uploaded yet</p>
-                </div>
-            `;
+            // Hide the entire My Files section if no files
+            if (myFilesSection) {
+                myFilesSection.style.display = 'none';
+            }
             return;
+        } else {
+            // Show the My Files section if there are files
+            if (myFilesSection) {
+                myFilesSection.style.display = 'block';
+            }
         }
 
         filesList.innerHTML = files.map(file => {
@@ -589,6 +599,16 @@ class VoiceTranscriberApp {
                 this.showSuccess('File deleted successfully');
                 this.loadMyFiles();
                 this.loadQuotaInfo();
+                // Check if we should hide My Files section after deletion
+                setTimeout(() => {
+                    const filesList = document.getElementById('filesList');
+                    if (filesList && filesList.children.length === 0) {
+                        const myFilesSection = document.querySelector('.my-files-section');
+                        if (myFilesSection) {
+                            myFilesSection.style.display = 'none';
+                        }
+                    }
+                }, 100);
             } else {
                 this.showError(data.error || 'Failed to delete file');
             }
@@ -613,6 +633,11 @@ class VoiceTranscriberApp {
                 this.showSuccess(`Cleaned up ${data.deleted_count} files`);
                 this.loadMyFiles();
                 this.loadQuotaInfo();
+                // Hide My Files section after cleanup
+                const myFilesSection = document.querySelector('.my-files-section');
+                if (myFilesSection) {
+                    myFilesSection.style.display = 'none';
+                }
             } else {
                 this.showError(data.error || 'Failed to cleanup files');
             }
@@ -650,6 +675,50 @@ class VoiceTranscriberApp {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
         }, 3000);
+    }
+
+    async checkExistingTranscripts() {
+        try {
+            // Check if there are any existing transcript files
+            const response = await fetch('/api/transcripts');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.transcripts && data.transcripts.length > 0) {
+                    this.displayExistingTranscripts(data.transcripts);
+                }
+            }
+        } catch (error) {
+            // If the endpoint doesn't exist or fails, check for the hardcoded file
+            this.checkForHardcodedTranscript();
+        }
+    }
+
+    checkForHardcodedTranscript() {
+        // Check if the hardcoded transcript file exists
+        fetch('/download/Sector_39_unified.md')
+            .then(response => {
+                if (response.ok) {
+                    this.displayExistingTranscripts(['Sector_39_unified.md']);
+                }
+            })
+            .catch(() => {
+                // File doesn't exist, keep section hidden
+            });
+    }
+
+    displayExistingTranscripts(transcripts) {
+        const existingTranscriptsSection = document.getElementById('existingTranscripts');
+        const existingTranscriptsList = document.getElementById('existingTranscriptsList');
+        
+        if (transcripts.length > 0) {
+            existingTranscriptsList.innerHTML = transcripts.map(transcript => `
+                <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="viewTranscript('${transcript}')">
+                    <i class="fas fa-file-alt"></i> ${transcript}
+                </button>
+            `).join('');
+            
+            existingTranscriptsSection.style.display = 'block';
+        }
     }
 
     showResults(result) {
