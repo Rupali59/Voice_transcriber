@@ -68,6 +68,9 @@ def upload_file():
 def start_transcription():
     """Start transcription process"""
     try:
+        current_app.logger.info(f"Transcribe request received. Content-Type: {request.content_type}")
+        current_app.logger.info(f"Form data: {dict(request.form)}")
+        current_app.logger.info(f"Files: {list(request.files.keys())}")
         # Handle both form data and JSON data
         if request.content_type and 'application/json' in request.content_type:
             # Handle JSON data (legacy)
@@ -124,6 +127,9 @@ def start_transcription():
             enable_speaker_diarization = request.form.get('diarization', 'false').lower() == 'true'
             language = request.form.get('language', 'auto')
             temperature = float(request.form.get('temperature', 0.2))
+            
+            # Set filename for later use
+            filename = file_upload.filename
         
         # Generate job ID
         job_id = str(uuid.uuid4())
@@ -170,7 +176,9 @@ def start_transcription():
         })
         
     except Exception as e:
+        import traceback
         current_app.logger.error(f"Transcription start error: {e}")
+        current_app.logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({'error': 'Failed to start transcription'}), 500
 
 @api_bp.route('/job/<job_id>')
