@@ -2,6 +2,12 @@
 
 Optimization strategies and performance tuning for the Voice Transcriber application.
 
+## ⚡ Quick Start
+- **What this covers**: Complete performance optimization guide with tuning strategies and monitoring
+- **Time needed**: 20-25 minutes for full read, 5-10 minutes for quick optimization
+- **Prerequisites**: Basic understanding of system administration and performance concepts
+- **Skip to**: [Performance Overview](#-performance-overview) | [Optimization Strategies](#-optimization-strategies) | [Monitoring](#-monitoring)
+
 ## 🎯 Performance Overview
 
 ### Key Performance Metrics

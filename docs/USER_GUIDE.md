@@ -2,6 +2,12 @@
 
 Complete guide to using the Voice Transcriber web application.
 
+## ⚡ Quick Start
+- **What this covers**: Complete user manual for the Voice Transcriber web application
+- **Time needed**: 10-15 minutes for full read, 2-3 minutes for quick start
+- **Prerequisites**: None - this guide covers everything from basic usage to advanced features
+- **Skip to**: [Getting Started](#-getting-started) | [Interface Guide](#-interface-guide) | [Understanding Results](#-understanding-results)
+
 ## 🎯 Overview
 
 Voice Transcriber is a web-based application that converts audio files into text using advanced AI models. It supports multiple languages, speaker identification, and real-time progress tracking.
@@ -146,12 +152,15 @@ The web interface is mobile-responsive:
 3. Try different settings
 4. Contact support if issues persist
 
-## 📚 Additional Resources
+## 📚 Related Documentation
 
-- **[API Reference](API_REFERENCE.md)**: For developers and integration
-- **[Technical Reference](TECHNICAL_REFERENCE.md)**: Architecture and implementation
-- **[Performance Guide](PERFORMANCE_GUIDE.md)**: Optimization tips
-- **[Deployment Guide](DEPLOYMENT.md)**: Setup and configuration
+- **Before reading this**: [Main Documentation](README.md) - Overview and quick start
+- **After reading this**: 
+  - [Troubleshooting](TROUBLESHOOTING.md) - If you encounter issues
+  - [Performance Guide](PERFORMANCE_GUIDE.md) - For optimization tips
+- **For developers**: [API Reference](API_REFERENCE.md) - Programmatic access
+- **For administrators**: [Deployment Guide](DEPLOYMENT.md) - Setup and configuration
+- **Technical details**: [Technical Reference](TECHNICAL_REFERENCE.md) - Architecture and implementation
 
 ---
 

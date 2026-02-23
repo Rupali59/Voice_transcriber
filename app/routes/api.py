@@ -745,6 +745,359 @@ def set_user_properties():
         current_app.logger.error(f"Set user properties error: {e}")
         return jsonify({'error': 'Failed to set user properties'}), 500
 
+# Model Cache Management Endpoints
+
+@api_bp.route('/cache/models')
+def get_model_cache_status():
+    """Get model cache status and statistics"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        stats = cache_manager.get_cache_stats()
+        health = cache_manager.get_cache_health()
+        
+        return jsonify({
+            'success': True,
+            'stats': stats,
+            'health': health,
+            'loaded_models': cache_manager.get_loaded_models(),
+            'available_models': cache_manager.get_available_models()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get model cache status error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get cache status'}), 500
+
+@api_bp.route('/cache/models/preload', methods=['POST'])
+def preload_models():
+    """Preload specific models into cache"""
+    try:
+        data = request.get_json()
+        if not data or 'models' not in data:
+            return jsonify({'error': 'Models list required'}), 400
+        
+        models = data['models']
+        if not isinstance(models, list):
+            return jsonify({'error': 'Models must be a list'}), 400
+        
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        cache_manager.preload_models(models)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Preloading models: {models}',
+            'loaded_models': cache_manager.get_loaded_models()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Preload models error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to preload models'}), 500
+
+@api_bp.route('/cache/models/ensure', methods=['POST'])
+def ensure_models_loaded():
+    """Ensure specific models are loaded"""
+    try:
+        data = request.get_json()
+        if not data or 'models' not in data:
+            return jsonify({'error': 'Models list required'}), 400
+        
+        models = data['models']
+        if not isinstance(models, list):
+            return jsonify({'error': 'Models must be a list'}), 400
+        
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        cache_manager.ensure_models_loaded(models)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Ensured models are loaded: {models}',
+            'loaded_models': cache_manager.get_loaded_models()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Ensure models loaded error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to ensure models loaded'}), 500
+
+@api_bp.route('/cache/models/priority/warmup', methods=['POST'])
+def warmup_priority_models():
+    """Warm up priority models"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        cache_manager.warmup_priority_models()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Priority models warmed up',
+            'loaded_models': cache_manager.get_loaded_models()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Warmup priority models error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to warmup priority models'}), 500
+
+@api_bp.route('/cache/models/<model_size>/status')
+def get_model_status(model_size):
+    """Get status of a specific model"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        status = cache_manager.get_model_status(model_size)
+        
+        return jsonify({
+            'success': True,
+            'model_size': model_size,
+            'status': status
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get model status error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get model status'}), 500
+
+@api_bp.route('/cache/models/<model_size>/reload', methods=['POST'])
+def reload_model(model_size):
+    """Force reload a specific model"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        cache_manager.force_reload_model(model_size)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Model {model_size} reloaded',
+            'loaded_models': cache_manager.get_loaded_models()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Reload model error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to reload model'}), 500
+
+@api_bp.route('/cache/clear', methods=['POST'])
+def clear_model_cache():
+    """Clear all cached models"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        cache_manager.clear_cache()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Model cache cleared',
+            'loaded_models': cache_manager.get_loaded_models()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Clear cache error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to clear cache'}), 500
+
+@api_bp.route('/cache/optimize', methods=['POST'])
+def optimize_model_cache():
+    """Optimize model cache memory usage"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        cache_manager = get_model_cache_manager()
+        
+        cache_manager.optimize_memory()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Cache memory optimized',
+            'health': cache_manager.get_cache_health()
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Optimize cache error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to optimize cache'}), 500
+
+# Model Validation Endpoints
+
+@api_bp.route('/validate/models')
+def get_validation_status():
+    """Get model validation status"""
+    try:
+        from app.services.model_validator import get_model_validator
+        validator = get_model_validator()
+        
+        results = validator.get_validation_results()
+        
+        return jsonify({
+            'success': True,
+            'validation_results': results,
+            'total_validations': len(results)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Get validation status error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to get validation status'}), 500
+
+@api_bp.route('/validate/models/<model_size>', methods=['POST'])
+def validate_single_model(model_size):
+    """Validate a single model"""
+    try:
+        from app.services.model_validator import get_model_validator
+        from app.services.model_cache_manager import get_model_cache_manager
+        
+        validator = get_model_validator()
+        cache_manager = get_model_cache_manager()
+        
+        # Get model from cache if available
+        model = cache_manager.get_model(model_size)
+        
+        # Validate model
+        result = validator.validate_model(model_size, model)
+        
+        return jsonify({
+            'success': True,
+            'model_size': model_size,
+            'validation_result': result
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Validate model error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to validate model'}), 500
+
+@api_bp.route('/validate/models/batch', methods=['POST'])
+def validate_multiple_models():
+    """Validate multiple models"""
+    try:
+        data = request.get_json()
+        if not data or 'models' not in data:
+            return jsonify({'error': 'Models list required'}), 400
+        
+        models = data['models']
+        if not isinstance(models, list):
+            return jsonify({'error': 'Models must be a list'}), 400
+        
+        from app.services.model_validator import get_model_validator
+        validator = get_model_validator()
+        
+        # Validate all models
+        results = validator.validate_all_models(models)
+        
+        return jsonify({
+            'success': True,
+            'validation_results': results
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Validate models error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to validate models'}), 500
+
+@api_bp.route('/validate/models/quick', methods=['POST'])
+def quick_validate_models():
+    """Quick validation of all loaded models"""
+    try:
+        from app.services.model_validator import get_model_validator
+        from app.services.model_cache_manager import get_model_cache_manager
+        
+        validator = get_model_validator()
+        cache_manager = get_model_cache_manager()
+        
+        # Get loaded models
+        loaded_models = cache_manager.get_loaded_models()
+        
+        if not loaded_models:
+            return jsonify({
+                'success': True,
+                'message': 'No models loaded for validation',
+                'loaded_models': []
+            })
+        
+        # Quick validation of loaded models
+        results = {}
+        for model_size in loaded_models:
+            model = cache_manager.get_model(model_size)
+            result = validator.validate_model(model_size, model)
+            results[model_size] = {
+                'status': result['status'],
+                'score': result['overall_score'],
+                'duration': result.get('duration', 0)
+            }
+        
+        return jsonify({
+            'success': True,
+            'loaded_models': loaded_models,
+            'validation_results': results
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Quick validate error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to quick validate models'}), 500
+
+@api_bp.route('/validate/models/health-check')
+def model_health_check():
+    """Quick health check of all models"""
+    try:
+        from app.services.model_cache_manager import get_model_cache_manager
+        from app.services.model_validator import get_model_validator
+        
+        cache_manager = get_model_cache_manager()
+        validator = get_model_validator()
+        
+        # Get cache health
+        cache_health = cache_manager.get_cache_health()
+        loaded_models = cache_manager.get_loaded_models()
+        
+        # Quick validation of loaded models
+        model_health = {}
+        for model_size in loaded_models:
+            try:
+                model = cache_manager.get_model(model_size)
+                if model is not None:
+                    # Basic functionality test
+                    test_audio = validator.test_audio_samples.get('sine_wave', {}).get('audio')
+                    if test_audio is not None:
+                        result = model.transcribe(test_audio)
+                        model_health[model_size] = {
+                            'status': 'healthy',
+                            'can_transcribe': len(result.get('text', '')) > 0
+                        }
+                    else:
+                        model_health[model_size] = {
+                            'status': 'healthy',
+                            'can_transcribe': True  # Assume healthy if no test audio
+                        }
+                else:
+                    model_health[model_size] = {
+                        'status': 'unhealthy',
+                        'can_transcribe': False
+                    }
+            except Exception as e:
+                model_health[model_size] = {
+                    'status': 'error',
+                    'error': str(e),
+                    'can_transcribe': False
+                }
+        
+        # Overall health status
+        healthy_models = sum(1 for health in model_health.values() if health['status'] == 'healthy')
+        total_models = len(model_health)
+        
+        overall_status = 'healthy' if healthy_models == total_models else 'degraded' if healthy_models > 0 else 'unhealthy'
+        
+        return jsonify({
+            'success': True,
+            'overall_status': overall_status,
+            'cache_health': cache_health,
+            'model_health': model_health,
+            'loaded_models': loaded_models,
+            'healthy_count': healthy_models,
+            'total_count': total_models
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Model health check error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to perform health check'}), 500
+
 @api_bp.route('/transcripts', methods=['GET'])
 def get_transcripts():
     """Get list of existing transcripts"""

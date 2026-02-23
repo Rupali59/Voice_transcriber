@@ -2,6 +2,12 @@
 
 Complete API documentation for the Voice Transcriber web application.
 
+## ⚡ Quick Start
+- **What this covers**: Complete API documentation with endpoints, examples, and integration guides
+- **Time needed**: 15-20 minutes for full read, 3-5 minutes for quick reference
+- **Prerequisites**: Basic understanding of REST APIs and HTTP methods
+- **Skip to**: [API Endpoints](#-api-endpoints) | [Integration Examples](#-integration-examples) | [WebSocket Events](#-websocket-events)
+
 ## 🌐 Base URL
 
 - **Development**: `http://localhost:5001`
@@ -476,6 +482,16 @@ curl -O http://localhost:5001/api/download/transcription_123e4567_20240901_23223
    - Check firewall settings
    - Verify connection URL
 
+## 📚 Related Documentation
+
+- **Before reading this**: [Main Documentation](README.md) - Overview and quick start
+- **After reading this**: 
+  - [Technical Reference](TECHNICAL_REFERENCE.md) - Architecture and implementation
+  - [Deployment Guide](DEPLOYMENT.md) - Production deployment
+  - [Performance Guide](PERFORMANCE_GUIDE.md) - API optimization
+- **For users**: [User Guide](USER_GUIDE.md) - End-user documentation
+- **Troubleshooting**: [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
+
 ---
 
-**For more information, see the [Technical Reference](TECHNICAL_REFERENCE.md) and [Web App Guide](WEB_APP_README.md).**
+**Built with ❤️ by Tathya** - Making voice transcription accessible and efficient.

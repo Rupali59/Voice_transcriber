@@ -2,6 +2,12 @@
 
 Comprehensive technical documentation for developers and system administrators.
 
+## ⚡ Quick Start
+- **What this covers**: Complete technical architecture, implementation details, and development setup
+- **Time needed**: 20-30 minutes for full read, 5-10 minutes for quick overview
+- **Prerequisites**: Basic understanding of Python, Flask, and web development
+- **Skip to**: [Architecture Overview](#-architecture-overview) | [Development Setup](#-development-setup) | [API Integration](#-api-integration)
+
 ## 🏗️ Architecture Overview
 
 ### System Components
@@ -400,6 +406,16 @@ def setup_logging(app):
 - **ERROR**: A serious problem occurred
 - **CRITICAL**: A very serious error occurred
 
+## 📚 Related Documentation
+
+- **Before reading this**: [Main Documentation](README.md) - Overview and quick start
+- **After reading this**: 
+  - [API Reference](API_REFERENCE.md) - Complete API documentation
+  - [Deployment Guide](DEPLOYMENT.md) - Production deployment
+  - [Performance Guide](PERFORMANCE_GUIDE.md) - Optimization strategies
+- **For users**: [User Guide](USER_GUIDE.md) - End-user documentation
+- **Troubleshooting**: [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
+
 ---
 
-**For more information, see the [API Reference](API_REFERENCE.md) and [Deployment Guide](DEPLOYMENT.md).**
+**Built with ❤️ by Tathya** - Making voice transcription accessible and efficient.

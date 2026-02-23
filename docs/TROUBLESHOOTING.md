@@ -2,6 +2,12 @@
 
 Common issues and solutions for the Voice Transcriber application.
 
+## ⚡ Quick Start
+- **What this covers**: Complete troubleshooting guide with common issues and step-by-step solutions
+- **Time needed**: 15-20 minutes for full read, 2-5 minutes for quick diagnosis
+- **Prerequisites**: Basic understanding of the application and system administration
+- **Skip to**: [Quick Diagnosis](#-quick-diagnosis) | [Common Issues](#-common-issues) | [Advanced Troubleshooting](#-advanced-troubleshooting)
+
 ## 🚨 Quick Diagnosis
 
 ### Health Check

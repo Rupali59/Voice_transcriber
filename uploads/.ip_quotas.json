@@ -1,1 +1,13 @@
-{}
+{
+  "127.0.0.1": {
+    "ip_address": "127.0.0.1",
+    "total_files": 5,
+    "total_size_mb": 2.5596790313720703,
+    "last_activity": "2025-09-04T13:03:05.260288",
+    "file_count_24h": 5,
+    "size_mb_24h": 2.5596790313720703,
+    "is_blocked": false,
+    "block_reason": null,
+    "block_until": null
+  }
+}

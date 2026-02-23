@@ -11,9 +11,12 @@ class Config:
     # Flask Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'voice-transcriber-secret-key-2024'
     
+    # Vercel-specific configuration
+    IS_VERCEL = os.environ.get('VERCEL') == '1'
+    
     # File Upload Configuration
-    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or 'uploads'
-    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 500 * 1024 * 1024))  # 500MB
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or ('/tmp/uploads' if IS_VERCEL else 'uploads')
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 4 * 1024 * 1024 if IS_VERCEL else 500 * 1024 * 1024))  # 4MB for Vercel, 500MB otherwise
     
     # Allowed file extensions
     ALLOWED_EXTENSIONS = {'wav', 'mp3', 'm4a', 'flac', 'ogg', 'wma', 'aac', 'mp4'}
@@ -24,11 +27,18 @@ class Config:
     FILE_CLEANUP_HOURS = int(os.environ.get('FILE_CLEANUP_HOURS', 24))
     
     # Model Cache Configuration
-    WHISPER_MODEL_CACHE_SIZE = int(os.environ.get('WHISPER_MODEL_CACHE_SIZE', 3))
-    MODEL_IDLE_TIMEOUT = int(os.environ.get('MODEL_IDLE_TIMEOUT', 1800))  # 30 minutes
-    MODEL_CLEANUP_INTERVAL = int(os.environ.get('MODEL_CLEANUP_INTERVAL', 300))  # 5 minutes
-    ENABLE_GPU_ACCELERATION = os.environ.get('ENABLE_GPU_ACCELERATION', 'true').lower() == 'true'
-    PRELOAD_MODELS = os.environ.get('PRELOAD_MODELS', 'base,small').split(',')
+    WHISPER_MODEL_CACHE_SIZE = int(os.environ.get('WHISPER_MODEL_CACHE_SIZE', 2 if IS_VERCEL else 5))  # Smaller for Vercel
+    MODEL_IDLE_TIMEOUT = int(os.environ.get('MODEL_IDLE_TIMEOUT', 1800 if IS_VERCEL else 3600))  # 30 min for Vercel, 1 hour otherwise
+    MODEL_CLEANUP_INTERVAL = int(os.environ.get('MODEL_CLEANUP_INTERVAL', 300 if IS_VERCEL else 600))  # 5 min for Vercel, 10 min otherwise
+    ENABLE_GPU_ACCELERATION = os.environ.get('ENABLE_GPU_ACCELERATION', 'false' if IS_VERCEL else 'true').lower() == 'true'
+    PRELOAD_MODELS = os.environ.get('PRELOAD_MODELS', 'base,small' if IS_VERCEL else 'base,small,medium').split(',')
+    
+    # Persistent Model Cache Configuration
+    PERSISTENT_MODEL_CACHE = os.environ.get('PERSISTENT_MODEL_CACHE', 'true').lower() == 'true'
+    ALWAYS_KEEP_MODELS = os.environ.get('ALWAYS_KEEP_MODELS', 'true').lower() == 'true'
+    WARMUP_MODELS = os.environ.get('WARMUP_MODELS', 'base,small,medium').split(',')
+    PRIORITY_MODELS = os.environ.get('PRIORITY_MODELS', 'base,small').split(',')
+    MODEL_CACHE_DIR = os.environ.get('MODEL_CACHE_DIR', 'model_cache')
     
     # IP-based DoS Protection Configuration
     MAX_FILES_PER_IP = int(os.environ.get('MAX_FILES_PER_IP', 50))

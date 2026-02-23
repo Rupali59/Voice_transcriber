@@ -391,6 +391,304 @@ class TestAPIEndpoints(unittest.TestCase):
             
             mock_cache.optimize_memory.assert_called_once()
     
+    def test_get_model_cache_status(self):
+        """Test getting model cache status"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_cache_stats.return_value = {
+                'cached_models': ['base', 'small'],
+                'cache_size': 2,
+                'max_cache_size': 3
+            }
+            mock_manager.get_cache_health.return_value = {
+                'status': 'healthy',
+                'loaded_models': ['base', 'small'],
+                'priority_coverage': 100
+            }
+            mock_manager.get_loaded_models.return_value = ['base', 'small']
+            mock_manager.get_available_models.return_value = ['tiny', 'base', 'small', 'medium', 'large']
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.get('/api/cache/models')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('stats', data)
+            self.assertIn('health', data)
+            self.assertIn('loaded_models', data)
+            self.assertIn('available_models', data)
+    
+    def test_preload_models(self):
+        """Test preloading models"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = ['base', 'small']
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/cache/models/preload',
+                                      json={'models': ['base', 'small']})
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertIn('loaded_models', data)
+            
+            mock_manager.preload_models.assert_called_once_with(['base', 'small'])
+    
+    def test_preload_models_invalid_data(self):
+        """Test preloading models with invalid data"""
+        response = self.client.post('/api/cache/models/preload',
+                                  json={'invalid': 'data'})
+        
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.data)
+        self.assertIn('error', data)
+    
+    def test_ensure_models_loaded(self):
+        """Test ensuring models are loaded"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = ['base', 'small']
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/cache/models/ensure',
+                                      json={'models': ['base', 'small']})
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertIn('loaded_models', data)
+            
+            mock_manager.ensure_models_loaded.assert_called_once_with(['base', 'small'])
+    
+    def test_warmup_priority_models(self):
+        """Test warming up priority models"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = ['base', 'small']
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/cache/models/priority/warmup')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertIn('loaded_models', data)
+            
+            mock_manager.warmup_priority_models.assert_called_once()
+    
+    def test_get_model_status(self):
+        """Test getting model status"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_model_status.return_value = {
+                'loaded': True,
+                'cached': True,
+                'priority': True,
+                'usage_stats': {'access_count': 5}
+            }
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.get('/api/cache/models/base/status')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('model_size', data)
+            self.assertIn('status', data)
+    
+    def test_reload_model(self):
+        """Test reloading model"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = ['base']
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/cache/models/base/reload')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertIn('loaded_models', data)
+            
+            mock_manager.force_reload_model.assert_called_once_with('base')
+    
+    def test_clear_model_cache(self):
+        """Test clearing model cache"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = []
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/cache/clear')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertIn('loaded_models', data)
+            
+            mock_manager.clear_cache.assert_called_once()
+    
+    def test_optimize_model_cache(self):
+        """Test optimizing model cache"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_cache_health.return_value = {'status': 'healthy'}
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/cache/optimize')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertIn('health', data)
+            
+            mock_manager.optimize_memory.assert_called_once()
+    
+    def test_get_validation_status(self):
+        """Test getting validation status"""
+        with patch('app.services.model_validator.get_model_validator') as mock_get_validator:
+            mock_validator = Mock()
+            mock_validator.get_validation_results.return_value = {
+                'validation1': {'status': 'passed', 'score': 0.9}
+            }
+            mock_get_validator.return_value = mock_validator
+            
+            response = self.client.get('/api/validate/models')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('validation_results', data)
+            self.assertIn('total_validations', data)
+    
+    def test_validate_single_model(self):
+        """Test validating single model"""
+        with patch('app.services.model_validator.get_model_validator') as mock_get_validator, \
+             patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_validator = Mock()
+            mock_validator.validate_model.return_value = {
+                'status': 'passed',
+                'score': 0.9,
+                'tests': {}
+            }
+            mock_get_validator.return_value = mock_validator
+            
+            mock_manager = Mock()
+            mock_manager.get_model.return_value = Mock()
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/validate/models/base')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('model_size', data)
+            self.assertIn('validation_result', data)
+    
+    def test_validate_multiple_models(self):
+        """Test validating multiple models"""
+        with patch('app.services.model_validator.get_model_validator') as mock_get_validator:
+            mock_validator = Mock()
+            mock_validator.validate_all_models.return_value = {
+                'overall_status': 'passed',
+                'models': {
+                    'base': {'status': 'passed', 'score': 0.9},
+                    'small': {'status': 'passed', 'score': 0.8}
+                }
+            }
+            mock_get_validator.return_value = mock_validator
+            
+            response = self.client.post('/api/validate/models/batch',
+                                      json={'models': ['base', 'small']})
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('validation_results', data)
+    
+    def test_validate_multiple_models_invalid_data(self):
+        """Test validating multiple models with invalid data"""
+        response = self.client.post('/api/validate/models/batch',
+                                  json={'invalid': 'data'})
+        
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.data)
+        self.assertIn('error', data)
+    
+    def test_quick_validate_models(self):
+        """Test quick validation of loaded models"""
+        with patch('app.services.model_validator.get_model_validator') as mock_get_validator, \
+             patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_validator = Mock()
+            mock_validator.validate_model.return_value = {
+                'status': 'passed',
+                'score': 0.9,
+                'duration': 1.5
+            }
+            mock_get_validator.return_value = mock_validator
+            
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = ['base', 'small']
+            mock_manager.get_model.return_value = Mock()
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/validate/models/quick')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('loaded_models', data)
+            self.assertIn('validation_results', data)
+    
+    def test_quick_validate_no_models(self):
+        """Test quick validation with no loaded models"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager:
+            mock_manager = Mock()
+            mock_manager.get_loaded_models.return_value = []
+            mock_get_manager.return_value = mock_manager
+            
+            response = self.client.post('/api/validate/models/quick')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('message', data)
+            self.assertEqual(data['loaded_models'], [])
+    
+    def test_model_health_check(self):
+        """Test model health check"""
+        with patch('app.services.model_cache_manager.get_model_cache_manager') as mock_get_manager, \
+             patch('app.services.model_validator.get_model_validator') as mock_get_validator:
+            mock_manager = Mock()
+            mock_manager.get_cache_health.return_value = {'status': 'healthy'}
+            mock_manager.get_loaded_models.return_value = ['base', 'small']
+            mock_manager.get_model.return_value = Mock()
+            mock_get_manager.return_value = mock_manager
+            
+            mock_validator = Mock()
+            mock_validator.test_audio_samples = {'sine_wave': {'audio': b'test'}}
+            mock_get_validator.return_value = mock_validator
+            
+            response = self.client.get('/api/validate/models/health-check')
+            
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.data)
+            self.assertTrue(data['success'])
+            self.assertIn('overall_status', data)
+            self.assertIn('cache_health', data)
+            self.assertIn('model_health', data)
+            self.assertIn('loaded_models', data)
+            self.assertIn('healthy_count', data)
+            self.assertIn('total_count', data)
+    
     def test_get_all_requests(self):
         """Test getting all requests"""
         with patch('app.get_request_tracker') as mock_get_tracker:
